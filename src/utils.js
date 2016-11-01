@@ -6,8 +6,26 @@ export const split = (str, tab) => {
 	let result = [];
 	_curr.forEach((item) => {
 		if (item !== '') {
-		    result.push(item);
+			result.push(item);
 		}
-	})
+	});
 	return result;
+};
+
+export const delay = (ms) => {
+	return new Promise((resolve, reject) => {
+		setTimeout(() => {
+			resolve();
+		}, parseInt(ms));
+	});
+};
+
+export const copyObj = (obj) => {
+	return JSON.parse(JSON.stringify(obj));
+};
+
+export const noopPromise = () => {
+	return new Promise((resolve, reject) => {
+		resolve();
+	});
 };

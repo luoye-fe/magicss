@@ -1,0 +1,29 @@
+{
+	"root": true,
+	"parser": "babel-eslint",
+	"extends": "standard",
+	"env": {
+		"node": true,
+		"browser": true,
+		"es6": true
+	},
+	"rules": {
+		"indent": [2, "tab"],
+		"semi": [2, "always"],
+		"eol-last": 0,
+		"no-tabs": 0,
+		"quotes": 0,
+		"wrap-iife": 0,
+		"no-unused-vars": 0,
+		"no-throw-literal": 0,
+		"no-unreachable": 0,
+		"space-before-function-paren": 0,
+		"no-extend-native": ["error", {
+			"exceptions": ["Object", "Date", "String", "Array", "Function"]
+		}],
+		"no-unneeded-ternary": ["error", {
+			"defaultAssignment": false
+		}],
+		"arrow-parens": 0
+	}
+}

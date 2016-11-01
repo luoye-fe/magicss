@@ -6,7 +6,7 @@ import { split } from './utils.js';
  * @param  {[String]} source [css source text]
  * @return {[Array]}        [array]
  * @css example
-	\/* 
+	\/*
 	 * {{delay:2000}}
 	 * 彩蛋时间到！
 	 *\/
@@ -30,6 +30,7 @@ import { split } from './utils.js';
 function format(source) {
 	let sweetResult = [];
 	source = source || '';
+	source = source.replace(/\r\n|[\r\u2028\u2029]/g, '\n');
 
 	let pos = -1;
 	let ch;
@@ -78,9 +79,15 @@ function format(source) {
 
 	// 处理注释
 	function handleComment() {
+		let prePos = pos;
 		let _source = source.substr(pos);
 		let commentStr = _source.match(Regx.comment)[0]; // 匹配 chunkComment 和 lineComment
 		next(commentStr.length);
+		while (/\s|\n/.test(ch)) {
+			commentStr += ch;
+			next();
+		}
+		// pos = prePos;
 		let resultOptions = {};
 		if (Regx.ruleOptionInComment.test(commentStr)) {
 			let optionsStr = commentStr.match(Regx.ruleOptionInComment)[1];
@@ -90,7 +97,7 @@ function format(source) {
 			type: 'comment',
 			comment: commentStr.replace(Regx.ruleOptionInComment, ''),
 			options: resultOptions
-		})
+		});
 	}
 
 	// 处理选择器
@@ -104,7 +111,7 @@ function format(source) {
 			selector: selectorStr.replace(Regx.bothWhiteSpace, ''), // 去掉选择器前后空格
 			options: resultObj.options,
 			style: resultObj.style
-		})
+		});
 	}
 
 	// 处理样式
@@ -118,7 +125,7 @@ function format(source) {
 			let optionsStr = allRulesStr.match(Regx.comment)[0].replace(Regx.whiteSpace, '').replace(Regx.commentFlag, '').replace(/\n/g, '');
 			resultOptions = splitSameStyleStr(optionsStr);
 		}
-		let styleStr = allRulesStr.replace(Regx.comment, '').replace(/\n/g, '').replace(/\{|\}/g, '')
+		let styleStr = allRulesStr.replace(Regx.comment, '').replace(/\n/g, '').replace(/\{|\}/g, '');
 		resultStyle = splitSameStyleStr(styleStr);
 		return {
 			options: resultOptions,
@@ -133,18 +140,20 @@ function format(source) {
 		_cur1.forEach((item) => {
 			let _cur2 = split(item, ':');
 			result[_cur2[0].replace(Regx.bothWhiteSpace, '')] = _cur2[1].replace(Regx.bothWhiteSpace, '');
-		})
+		});
 		return result;
 	}
 
+	next();
 	while (true) {
-		next();
 		if (!ch) {
 			break;
 		} else if (ch === '/' && (nnext() === '*' || nnext() === '/')) { // comment
 			handleComment();
 		} else if (allSelectorFirstCh.includes(ch)) { // selector
 			handleSelector();
+		} else {
+			next();
 		}
 	}
 

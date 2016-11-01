@@ -18,9 +18,28 @@ var split = function split(str, tab) {
 	return result;
 };
 
-function format(source) {
+var delay = function delay(ms) {
+	return new Promise(function (resolve, reject) {
+		setTimeout(function () {
+			resolve();
+		}, parseInt(ms));
+	});
+};
+
+var copyObj = function copyObj(obj) {
+	return JSON.parse(JSON.stringify(obj));
+};
+
+var noopPromise = function noopPromise() {
+	return new Promise(function (resolve, reject) {
+		resolve();
+	});
+};
+
+function format$1(source) {
 	var sweetResult = [];
 	source = source || '';
+	source = source.replace(/\r\n|[\r\u2028\u2029]/g, '\n');
 
 	var pos = -1;
 	var ch = void 0;
@@ -69,9 +88,15 @@ function format(source) {
 
 	// 处理注释
 	function handleComment() {
+		var prePos = pos;
 		var _source = source.substr(pos);
 		var commentStr = _source.match(Regx.comment)[0]; // 匹配 chunkComment 和 lineComment
 		next(commentStr.length);
+		while (/\s|\n/.test(ch)) {
+			commentStr += ch;
+			next();
+		}
+		// pos = prePos;
 		var resultOptions = {};
 		if (Regx.ruleOptionInComment.test(commentStr)) {
 			var optionsStr = commentStr.match(Regx.ruleOptionInComment)[1];
@@ -128,8 +153,8 @@ function format(source) {
 		return result;
 	}
 
+	next();
 	while (true) {
-		next();
 		if (!ch) {
 			break;
 		} else if (ch === '/' && (nnext() === '*' || nnext() === '/')) {
@@ -138,10 +163,64 @@ function format(source) {
 		} else if (allSelectorFirstCh.includes(ch)) {
 			// selector
 			handleSelector();
+		} else {
+			next();
 		}
 	}
 
 	return sweetResult;
+}
+
+function $(selector) {
+	return document.querySelector(selector);
+}
+
+function createElement(tag, attrs, content) {
+	var el = document.createElement(tag);
+	var i = void 0;
+	for (i in attrs) {
+		if (attrs.hasOwnProperty(i)) {
+			el.setAttribute(i, attrs[i]);
+		}
+	}
+	if (content) {
+		html(el, content);
+	}
+	return el;
+}
+
+function append(parent) {
+	for (var _len = arguments.length, eles = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+		eles[_key - 1] = arguments[_key];
+	}
+
+	eles.forEach(function (ele) {
+		parent.appendChild(ele);
+	});
+}
+
+function html(eles, html) {
+	_put(html, 0, eles);
+}
+
+
+
+function _put(string, type) {
+	for (var _len2 = arguments.length, eles = Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
+		eles[_key2 - 2] = arguments[_key2];
+	}
+
+	eles.forEach(function (ele) {
+		if (type) {
+			if (typeof ele.textContent === 'string') {
+				ele.textContent = string;
+			} else {
+				ele.innerText = string;
+			}
+		} else {
+			ele.innerHTML = string;
+		}
+	});
 }
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -149,42 +228,263 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Magicss = function () {
-	function Magicss(source) {
-		var _this = this;
-
+	function Magicss(options) {
 		_classCallCheck(this, Magicss);
 
-		this.source = source;
+		this.options = options || {};
+		this.source = options.source || '';
+		this.codeCon = options.codeCon || false;
 		this.paused = false; // 打印状态
-		this.printOptions = {
-			speed: 20, // ms/每字符
-			delay: 2000
+		this.defaultPrintOptions = {
+			speed: 50, // ms/每字符
+			delay: 0
 		};
-		this.format = function () {
-			return format(_this.source);
-		};
+		this.formatedArray = [];
+		this.format();
+		this.index = 0;
 	}
-	// print source text in content
+
+	// init
 
 
 	_createClass(Magicss, [{
+		key: 'init',
+		value: function init() {
+			var _this = this;
+
+			if (this.index >= this.formatedArray.length) {
+				return;
+			}
+			var _current = this.formatedArray[this.index];
+			if (_current.type === 'comment') {
+				this.handlerComment(_current, function () {
+					_this.index++;
+					_this.init();
+				});
+			} else if (_current.type === 'common') {
+				this.handlerCommon(_current, function () {
+					_this.index++;
+					_this.init();
+				});
+			}
+		}
+	}, {
+		key: 'assignPrintOption',
+		value: function assignPrintOption(options) {
+			return Object.assign(copyObj(this.defaultPrintOptions), options);
+		}
+	}, {
+		key: 'handlerComment',
+		value: function handlerComment(current, cb) {
+			var _this2 = this;
+
+			var options = this.assignPrintOption(current.options);
+			noopPromise().then(function () {
+				return delay(options.delay);
+			}).then(function () {
+				if (_this2.codeCon) {
+					return _this2.print(current);
+				}
+			}).then(function () {
+				cb();
+			});
+		}
+	}, {
+		key: 'handlerCommon',
+		value: function handlerCommon(current, cb) {
+			var _this3 = this;
+
+			var options = this.assignPrintOption(current.options);
+			noopPromise().then(function () {
+				return delay(options.delay);
+			}).then(function () {
+				if (_this3.codeCon) {
+					return _this3.print(current);
+				}
+			}).then(function () {
+				cb();
+			});
+		}
+
+		// format css to obj
+
+	}, {
+		key: 'format',
+		value: function format() {
+			this.formatedArray = format$1(this.source);
+			return this.formatedArray;
+		}
+
+		// change source text
+
+	}, {
+		key: 'setOptions',
+		value: function setOptions(options) {
+			this.constructor(options);
+			this.init();
+		}
+
+		// apply style
+
+	}, {
+		key: 'applyStyle',
+		value: function applyStyle(selector, styleKey, styleValue) {
+			if (!$('#Magicss-style-con')) {
+				append($('head'), createElement('style', {
+					id: 'Magicss-style-con'
+				}));
+			}
+			var styleCon = $('#Magicss-style-con');
+			var styleConHTML = styleCon.innerHTML;
+			html(styleCon, styleConHTML += selector + '{' + styleKey + ':' + styleValue + '}');
+		}
+
+		// insert element
+
+	}, {
+		key: 'insertElement',
+		value: function insertElement(className) {
+			var ele = createElement('span', {
+				class: className
+			});
+			append($(this.codeCon), ele);
+			return ele;
+		}
+
+		// print source text in ele
+
+	}, {
 		key: 'print',
-		value: function print(content) {}
+		value: function print(current, ele) {
+			var _this4 = this;
+
+			var codeCon = $(this.codeCon);
+			if (!codeCon) {
+				console.warn('Please give a real element to options of "codeCon".');
+				return;
+			}
+			return new Promise(function (resolve, reject) {
+				if (current.type === 'comment') {
+					var contentArr = split(current.comment, '');
+					var _ele = _this4.insertElement('comment');
+					var options = _this4.assignPrintOption(current.options);
+					_this4.writeCharacterArrToEle(_ele, contentArr, options.speed).then(function () {
+						resolve();
+					});
+				} else if (current.type === 'common') {
+					(function () {
+						var options = _this4.assignPrintOption(current.options);
+						noopPromise().then(function () {
+							var contentArr = split(current.selector, '');
+							var ele = _this4.insertElement('selector');
+							return _this4.writeCharacterArrToEle(ele, contentArr, options.speed);
+						}).then(function () {
+							var contentArr = [' ', '{', '\n'];
+							var ele = $(_this4.codeCon);
+							return _this4.writeCharacterArrToEle(ele, contentArr, options.speed);
+						}).then(function () {
+							var promises = [];
+							var ruleKeys = Object.keys(current.style);
+							var index = 0;
+							return new Promise(function (resolve, reject) {
+								var iterateRule = function iterateRule() {
+									if (index >= ruleKeys.length) {
+										resolve();
+										return;
+									}
+									var codeCon = $(_this4.codeCon);
+									_this4.writeCharacterArrToEle(codeCon, [' ', ' ', ' ', ' '], options.speed).then(function () {
+										var contentArr = split(ruleKeys[index], '');
+										var ele = _this4.insertElement('key');
+										return _this4.writeCharacterArrToEle(ele, contentArr, options.speed);
+									}).then(function () {
+										return _this4.writeCharacterArrToEle(codeCon, [':', ' '], options.speed);
+									}).then(function () {
+										var contentArr = split(current.style[ruleKeys[index]], '');
+										var ele = _this4.insertElement('value');
+										return _this4.writeCharacterArrToEle(ele, contentArr, options.speed);
+									}).then(function () {
+										_this4.applyStyle(current.selector, ruleKeys[index], current.style[ruleKeys[index]]);
+										return _this4.writeCharacterArrToEle(codeCon, [';', '\n'], options.speed);
+									}).then(function () {
+										index++;
+										iterateRule();
+									});
+								};
+								iterateRule();
+							});
+						}).then(function () {
+							var contentArr = ['}', '\n\n'];
+							var ele = $(_this4.codeCon);
+							return _this4.writeCharacterArrToEle(ele, contentArr, options.speed);
+						}).then(function () {
+							resolve();
+						});
+					})();
+				}
+			});
+		}
+	}, {
+		key: 'writeCharacterArrToEle',
+		value: function writeCharacterArrToEle(ele, contentArr, speedMs) {
+			var _this5 = this;
+
+			return new Promise(function (resolve, reject) {
+				var innserLoop = function innserLoop(ele, contentArr, speedMs) {
+					_this5.fixScrollTop();
+					if (!contentArr.length) {
+						resolve();
+						return;
+					}
+					var currentHTML = ele.innerHTML;
+					noopPromise().then(function () {
+						return delay(speedMs);
+					}).then(function () {
+						if (!_this5.paused) {
+							html(ele, currentHTML += contentArr[0]);
+							contentArr.splice(0, 1);
+							innserLoop(ele, contentArr, speedMs);
+						} else {
+							innserLoop(ele, contentArr, speedMs);
+						}
+					});
+				};
+				innserLoop(ele, contentArr, speedMs);
+			});
+		}
+
 		// pause print
 
 	}, {
 		key: 'pause',
-		value: function pause() {}
+		value: function pause() {
+			this.paused = true;
+		}
+
 		// continue print
 
 	}, {
 		key: 'continue',
-		value: function _continue() {}
+		value: function _continue() {
+			this.paused = false;
+		}
+
 		// toggle print
 
 	}, {
 		key: 'toggle',
-		value: function toggle() {}
+		value: function toggle() {
+			this.paused = !this.paused;
+		}
+
+		// fix con scroll top
+
+	}, {
+		key: 'fixScrollTop',
+		value: function fixScrollTop() {
+			var codeCon = $(this.codeCon);
+			codeCon.scrollTop = codeCon.scrollHeight;
+		}
 	}]);
 
 	return Magicss;

@@ -5,98 +5,199 @@
     <meta charset="UTF-8">
     <title>Magicss</title>
     <style type="text/css">
-        #work_con {
-            position: fixed;
-            right: 10px;
-            top: 10px;
-            width: 400px;
-            height: 300px;
-            padding: 10px 15px;
-            color: #fff;
-            background: #2d2d2d;
-            overflow: auto;
-            border: 1px solid #ccc;
-            font-size: 12px;
-            box-shadow: -4px 4px 2px 0 rgba(0, 0, 0, 0.3);
-            white-space: pre-wrap;
-            outline: 0;
-            line-height: 16px;
+    #work_con {
+        position: fixed;
+        right: 10px;
+        top: 10px;
+        width: 400px;
+        height: 300px;
+        padding: 10px 15px;
+        color: #fff;
+        background: #2d2d2d;
+        overflow: auto;
+        border: 1px solid #ccc;
+        font-size: 12px;
+        box-shadow: -4px 4px 2px 0 rgba(0, 0, 0, 0.3);
+        white-space: pre-wrap;
+        outline: 0;
+        line-height: 16px;
+    }
+    
+    #work_con:hover {
+        box-shadow: 0px 0px 40px 5px rgba(255, 255, 255, 0.4);
+    }
+    
+    #work_con .comment {
+        color: #747269;
+        font-style: italic;
+    }
+    
+    #work_con .selector {
+        color: #e96951;
+    }
+    
+    #work_con .key {
+        color: #fb9356;
+    }
+    
+    #work_con .value {
+        color: #62cbcc;
+    }
+    
+    .switchBtn {
+        position: fixed;
+        left: 10px;
+        bottom: 10px;
+        font-size: 14px;
+        color: #ff5151;
+        cursor: pointer;
+    }
+    
+    .type_effect {
+        display: inline-block;
+        vertical-align: middle;
+        width: 1px;
+        height: 14px;
+        margin: 0 4px;
+        -webkit-transition: none;
+    }
+    
+    @-webkit-keyframes work_con {
+        0% {
+            opacity: 0.5;
+            top: 20px;
         }
-        #work_con:hover{
-          box-shadow: 0px 0px 40px 5px rgba(255,255,255,0.4);
+        50% {
+            opacity: 1;
+            top: 0px;
         }
-
-        #work_con .comment {
-            color: #747269;
-            font-style: italic;
+        100% {
+            opacity: 0.5;
+            top: 20px;
         }
-        #work_con .selector {
-            color: #e96951;
+    }
+    
+    @-webkit-keyframes eyeclose1 {
+        0% {
+            top: 19px;
         }
-        #work_con .key {
-            color: #fb9356;
+        50% {
+            top: 27px;
         }
-        #work_con .value {
-            color: #62cbcc;
+        100% {
+            top: 19px;
         }
-
-        .switchBtn {
-            position: fixed;left: 10px;bottom: 10px;font-size: 14px;color: #ff5151;cursor: pointer;
+    }
+    
+    @-webkit-keyframes eyeclose2 {
+        0% {
+            bottom: 12px;
         }
-        .type_effect {
-            display: inline-block;vertical-align: middle;width: 1px;height: 14px;margin: 0 4px;-webkit-transition: none;
+        50% {
+            bottom: 19px;
         }
-        @-webkit-keyframes work_con {
-            0% {opacity: 0.5;top: 20px;}
-            50% {opacity: 1;top: 0px;}
-            100% {opacity: 0.5;top: 20px;}
+        100% {
+            bottom: 12px;
         }
-        @-webkit-keyframes eyeclose1 {
-            0% {top: 19px;}
-            50% {top: 27px;}
-            100% {top: 19px;}
+    }
+    
+    @keyframes myfirst {
+        0% {
+            -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
         }
-        @-webkit-keyframes eyeclose2 {
-            0% {bottom: 12px;}
-            50% {bottom: 19px;}
-            100% {bottom: 12px;}
+        25% {
+            -webkit-transform: rotate(10deg);
+            transform: rotate(10deg);
         }
-        @keyframes myfirst {
-            0% {-webkit-transform: rotate(0deg);transform: rotate(0deg);}
-            25% {-webkit-transform: rotate(10deg);transform: rotate(10deg);}
-            50% {-webkit-transform: rotate(0deg);transform: rotate(0deg);}
-            75% {-webkit-transform: rotate(-10deg);transform: rotate(-10deg);}
-            100% {-webkit-transform: rotate(0deg);transform: rotate(0deg);}
+        50% {
+            -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
         }
-        @-moz-keyframes myfirst {
-            0% {-webkit-transform: rotate(0deg);transform: rotate(0deg);}
-            25% {-webkit-transform: rotate(10deg);transform: rotate(10deg);}
-            50% {-webkit-transform: rotate(0deg);transform: rotate(0deg);}
-            75% {-webkit-transform: rotate(-10deg);transform: rotate(-10deg);}
-            100% {-webkit-transform: rotate(0deg);transform: rotate(0deg);}
+        75% {
+            -webkit-transform: rotate(-10deg);
+            transform: rotate(-10deg);
         }
-        @-webkit-keyframes myfirst {
-            0% {-webkit-transform: rotate(0deg);transform: rotate(0deg);}
-            25% {-webkit-transform: rotate(10deg);transform: rotate(10deg);}
-            50% {-webkit-transform: rotate(0deg);transform: rotate(0deg);}
-            75% {-webkit-transform: rotate(-10deg);transform: rotate(-10deg);}
-            100% {-webkit-transform: rotate(0deg);transform: rotate(0deg);}
+        100% {
+            -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
         }
-
-        @-webkit-keyframes innerEyeBlink {
-            from {-webkit-transform: rotate(0deg);}
-            50% {-webkit-transform: rotate(-5deg);}
-            100% {-webkit-transform: rotate(0deg);}
+    }
+    
+    @-moz-keyframes myfirst {
+        0% {
+            -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
         }
-        @-moz-keyframes innerEyeBlink {
-            from {-moz-transform: rotate(0deg);}
-            50% {-moz-transform: rotate(-5deg);}
-            100% {-moz-transform: rotate(0deg);}
+        25% {
+            -webkit-transform: rotate(10deg);
+            transform: rotate(10deg);
         }
+        50% {
+            -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+        }
+        75% {
+            -webkit-transform: rotate(-10deg);
+            transform: rotate(-10deg);
+        }
+        100% {
+            -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+        }
+    }
+    
+    @-webkit-keyframes myfirst {
+        0% {
+            -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+        }
+        25% {
+            -webkit-transform: rotate(10deg);
+            transform: rotate(10deg);
+        }
+        50% {
+            -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+        }
+        75% {
+            -webkit-transform: rotate(-10deg);
+            transform: rotate(-10deg);
+        }
+        100% {
+            -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+        }
+    }
+    
+    @-webkit-keyframes innerEyeBlink {
+        from {
+            -webkit-transform: rotate(0deg);
+        }
+        50% {
+            -webkit-transform: rotate(-5deg);
+        }
+        100% {
+            -webkit-transform: rotate(0deg);
+        }
+    }
+    
+    @-moz-keyframes innerEyeBlink {
+        from {
+            -moz-transform: rotate(0deg);
+        }
+        50% {
+            -moz-transform: rotate(-5deg);
+        }
+        100% {
+            -moz-transform: rotate(0deg);
+        }
+    }
     </style>
 </head>
 
 <body>
+    <pre id="work_con"></pre>
     <div class="Baymax">
         <div class="head">
             <div class="cover-s">
@@ -130,98 +231,6 @@
         <div class="leg-l"></div>
         <div class="leg-r"></div>
     </div>
-    <div id="qq">
-        <div id="lightmask">
-            <div class="headmask"></div>
-            <div class="mouthmask"></div>
-        </div>
-        <div id="head" class='head'>
-            <div class='left eye'>
-                <div class="eyelipLeftTop"></div>
-                <div class="eyelipLeftBottom"></div>
-                <div class="innerLeftEye">
-                </div>
-            </div>
-            <div class='right eye'>
-                <div class="eyelipRightTop"></div>
-                <div class="eyelipRightBottom"></div>
-                <div class="innerRightEye">
-                    <div class="fix"></div>
-                </div>
-            </div>
-            <div class='mouthTopContainer'>
-                <div class='mouthTop'></div>
-            </div>
-            <div class="mouthBottomContainer">
-                <div class="mouthBottom"></div>
-            </div>
-            <div class="lipsContainer">
-                <div class="lips">
-                    <div class="lipShadow left" id="lsl">
-                    </div>
-                    <div class="lipShadow right" id="lsr">
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div id="body" class="body">
-            <div class="innerWrapper">
-                <div class="inner">
-                </div>
-            </div>
-            <div class="outterWrapper">
-                <div class='outter'>
-                </div>
-            </div>
-            <div class="scarf">
-                <div class="scarfShadow">
-                </div>
-                <div class="scarfShadowRight">
-                </div>
-            </div>
-            <div class="scarfEnd">
-                <div class="scarfEndShadow">
-                </div>
-            </div>
-        </div>
-        <div id="hand" class="handWrapper">
-            <div class="leftHandTopContainer">
-                <div class="leftHandTop">
-                </div>
-            </div>
-            <div class="leftHandBottomContainer">
-                <div class="leftHandBottom">
-                </div>
-            </div>
-            <div class="rightHandTopContainer">
-                <div class="rightHandTop">
-                </div>
-            </div>
-            <div class="rightHandBottomContainer">
-                <div class="rightHandBottom">
-                </div>
-            </div>
-        </div>
-        <div id="foot" class='footWrapper'>
-            <div class="leftFootTopWrapper">
-                <div class="leftFootTop">
-                </div>
-            </div>
-            <div class="leftFootBottomWrapper">
-                <div class="leftFootBottom">
-                </div>
-            </div>
-            <div class='toe left'></div>
-            <div class="rightFootTopWrapper">
-                <div class="rightFootTop">
-                </div>
-            </div>
-            <div class="rightFootBottomWrapper">
-                <div class="rightFootBottom">
-                </div>
-            </div>
-            <div class='toe right'></div>
-        </div>
     </div>
     <script type="text/javascript" src="../dist/magicss.js"></script>
     <script type="text/javascript" src="./index.js"></script>

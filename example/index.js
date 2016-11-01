@@ -1,3 +1,4 @@
+/* global Magicss */
 var sourceText = `
 * {
     -webkit-transition: all ease 1s;
@@ -304,8 +305,14 @@ html, body {
 .Baymax .cover-x {
     -webkit-animation: eyeclose2 2s infinite 0.8s;
 }
+
 `;
 
-var Baymax = new Magicss(sourceText);
+var Baymax = new Magicss({
+	source: sourceText,
+	codeCon: '#work_con'
+});
 console.log(Baymax.format());
+Baymax.init();
 
+// Baymax.print()
