@@ -1,0 +1,20 @@
+{
+	"name": "magicss",
+	"version": "1.0.0",
+	"description": "magicss",
+	"author": "luoye <842891024@qq.com>",
+	"main": "src/app.js",
+	"scripts": {
+		"dev": "./node_modules/.bin/rollup -w -m -c build/config.js --env=dev",
+		"build": "node build/build.js"
+	},
+	"devDependencies": {
+		"babel-preset-latest": "^6.16.0",
+		"minimist": "^1.2.0",
+		"rollup": "^0.36.3",
+		"rollup-plugin-babel": "^2.6.1",
+		"rollup-plugin-eslint": "^3.0.0",
+		"rollup-watch": "^2.5.0",
+		"uglify-js": "^2.7.3"
+	}
+}
