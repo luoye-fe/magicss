@@ -174,16 +174,6 @@ export default class Magicss {
 		});
 	}
 
-	_handlerNoCodeCon(cb) {
-		return new Promise((resolve, reject) => {
-			if ($(this.codeCod)) {
-				resolve();
-			} else {
-				reject();
-			}
-		});
-	}
-
 	// fix con scroll top
 	_fixScrollTop() {
 		let codeCon = $(this._codeCon);
