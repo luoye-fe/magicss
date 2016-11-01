@@ -26,10 +26,6 @@ export function html(eles, html) {
 	_put(html, 0, eles);
 }
 
-export function text(eles, text) {
-	_put(text, 1, eles);
-}
-
 function _put(string, type, ...eles) {
 	eles.forEach((ele) => {
 		if (type) {
