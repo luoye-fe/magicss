@@ -4,88 +4,54 @@ import { createElement, append, html, text, $ } from './dom.js';
 
 import { delay, copyObj, noopPromise, split } from './utils.js';
 
+const defaultPrintOptions = {
+	speed: 50, // ms/每字符
+	delay: 0
+};
+
 export default class Magicss {
 	constructor(options) {
 		this.options = options || {};
 		this.source = options.source || '';
-		this.codeCon = options.codeCon || false;
-		this.paused = false; // 打印状态
-		this.defaultPrintOptions = {
-			speed: 50, // ms/每字符
-			delay: 0
-		};
-		this.formatedArray = [];
+		this._codeCon = options.codeCon || false;
+		this._paused = false; // 打印状态
+		this._formatedArray = [];
+		this._index = 0;
 		this.format();
-		this.index = 0;
 	}
 
-	// init
-	init() {
-		if (this.index >= this.formatedArray.length) {
-			return;
-		}
-		const _current = this.formatedArray[this.index];
-		if (_current.type === 'comment') {
-			this.handlerComment(_current, () => {
-				this.index++;
-				this.init();
-			});
-		} else if (_current.type === 'common') {
-			this.handlerCommon(_current, () => {
-				this.index++;
-				this.init();
-			});
-		}
+	_assignPrintOption(options) {
+		return Object.assign(copyObj(defaultPrintOptions), options);
 	}
 
-	assignPrintOption(options) {
-		return Object.assign(copyObj(this.defaultPrintOptions), options);
-	}
-
-	handlerComment(current, cb) {
-		let options = this.assignPrintOption(current.options);
+	_handlerComment(current, cb) {
+		let options = this._assignPrintOption(current.options);
 		noopPromise()
 			.then(() => {
 				return delay(options.delay);
 			})
 			.then(() => {
-				if (this.codeCon) {
-					return this.print(current);
-				}
+				return this._print(current);
 			}).then(() => {
 				cb();
 			});
 	}
 
-	handlerCommon(current, cb) {
-		let options = this.assignPrintOption(current.options);
+	_handlerCommon(current, cb) {
+		let options = this._assignPrintOption(current.options);
 		noopPromise()
 			.then(() => {
 				return delay(options.delay);
 			})
 			.then(() => {
-				if (this.codeCon) {
-					return this.print(current);
-				}
+				return this._print(current);
 			}).then(() => {
 				cb();
 			});
-	}
-
-	// format css to obj
-	format() {
-		this.formatedArray = format(this.source);
-		return this.formatedArray;
-	}
-
-	// change source text
-	setOptions(options) {
-		this.constructor(options);
-		this.init();
 	}
 
 	// apply style
-	applyStyle(selector, styleKey, styleValue) {
+	_applyStyle(selector, styleKey, styleValue) {
 		if (!$('#Magicss-style-con')) {
 			append($('head'), createElement('style', {
 				id: 'Magicss-style-con'
@@ -97,42 +63,40 @@ export default class Magicss {
 	}
 
 	// insert element
-	insertElement(className) {
+	_insertElement(className) {
 		let ele = createElement('span', {
 			class: className
 		});
-		append($(this.codeCon), ele);
+		append($(this._codeCon), ele);
 		return ele;
 	}
 
 	// print source text in ele
-	print(current, ele) {
-		let codeCon = $(this.codeCon);
-		if (!codeCon) {
-			console.warn('Please give a real element to options of "codeCon".');
-			return;
-		}
+	_print(current, ele) {
 		return new Promise((resolve, reject) => {
 			if (current.type === 'comment') {
-				let contentArr = split(current.comment, '');
-				let ele = this.insertElement('comment');
-				let options = this.assignPrintOption(current.options);
-				this.writeCharacterArrToEle(ele, contentArr, options.speed)
+				noopPromise()
+					.then(() => {
+						let contentArr = split(current.comment, '');
+						let ele = this._insertElement('comment');
+						let options = this._assignPrintOption(current.options);
+						return this._writeCharacterArrToEle(ele, contentArr, options.speed);
+					})
 					.then(() => {
 						resolve();
 					});
 			} else if (current.type === 'common') {
-				let options = this.assignPrintOption(current.options);
+				let options = this._assignPrintOption(current.options);
 				noopPromise()
 					.then(() => {
 						let contentArr = split(current.selector, '');
-						let ele = this.insertElement('selector');
-						return this.writeCharacterArrToEle(ele, contentArr, options.speed);
+						let ele = this._insertElement('selector');
+						return this._writeCharacterArrToEle(ele, contentArr, options.speed);
 					})
 					.then(() => {
 						let contentArr = [' ', '{', '\n'];
-						let ele = $(this.codeCon);
-						return this.writeCharacterArrToEle(ele, contentArr, options.speed);
+						let ele = $(this._codeCon);
+						return this._writeCharacterArrToEle(ele, contentArr, options.speed);
 					})
 					.then(() => {
 						let promises = [];
@@ -144,24 +108,24 @@ export default class Magicss {
 									resolve();
 									return;
 								}
-								let codeCon = $(this.codeCon);
-								this.writeCharacterArrToEle(codeCon, [' ', ' ', ' ', ' '], options.speed)
+								let codeCon = $(this._codeCon);
+								this._writeCharacterArrToEle(codeCon, [' ', ' ', ' ', ' '], options.speed)
 									.then(() => {
 										let contentArr = split(ruleKeys[index], '');
-										let ele = this.insertElement('key');
-										return this.writeCharacterArrToEle(ele, contentArr, options.speed);
+										let ele = this._insertElement('key');
+										return this._writeCharacterArrToEle(ele, contentArr, options.speed);
 									})
 									.then(() => {
-										return this.writeCharacterArrToEle(codeCon, [':', ' '], options.speed);
+										return this._writeCharacterArrToEle(codeCon, [':', ' '], options.speed);
 									})
 									.then(() => {
 										let contentArr = split(current.style[ruleKeys[index]], '');
-										let ele = this.insertElement('value');
-										return this.writeCharacterArrToEle(ele, contentArr, options.speed);
+										let ele = this._insertElement('value');
+										return this._writeCharacterArrToEle(ele, contentArr, options.speed);
 									})
 									.then(() => {
-										this.applyStyle(current.selector, ruleKeys[index], current.style[ruleKeys[index]]);
-										return this.writeCharacterArrToEle(codeCon, [';', '\n'], options.speed);
+										this._applyStyle(current.selector, ruleKeys[index], current.style[ruleKeys[index]]);
+										return this._writeCharacterArrToEle(codeCon, [';', '\n'], options.speed);
 									})
 									.then(() => {
 										index++;
@@ -173,8 +137,8 @@ export default class Magicss {
 					})
 					.then(() => {
 						let contentArr = ['}', '\n\n'];
-						let ele = $(this.codeCon);
-						return this.writeCharacterArrToEle(ele, contentArr, options.speed);
+						let ele = $(this._codeCon);
+						return this._writeCharacterArrToEle(ele, contentArr, options.speed);
 					})
 					.then(() => {
 						resolve();
@@ -183,10 +147,10 @@ export default class Magicss {
 		});
 	}
 
-	writeCharacterArrToEle(ele, contentArr, speedMs) {
+	_writeCharacterArrToEle(ele, contentArr, speedMs) {
 		return new Promise((resolve, reject) => {
 			const innserLoop = (ele, contentArr, speedMs) => {
-				this.fixScrollTop();
+				this._fixScrollTop();
 				if (!contentArr.length) {
 					resolve();
 					return;
@@ -197,7 +161,7 @@ export default class Magicss {
 						return delay(speedMs);
 					})
 					.then(() => {
-						if (!this.paused) {
+						if (!this._paused) {
 							html(ele, currentHTML += contentArr[0]);
 							contentArr.splice(0, 1);
 							innserLoop(ele, contentArr, speedMs);
@@ -210,24 +174,72 @@ export default class Magicss {
 		});
 	}
 
-	// pause print
-	pause() {
-		this.paused = true;
-	}
-
-	// continue print
-	continue () {
-		this.paused = false;
-	}
-
-	// toggle print
-	toggle() {
-		this.paused = !this.paused;
+	_handlerNoCodeCon(cb) {
+		return new Promise((resolve, reject) => {
+			if ($(this.codeCod)) {
+				resolve();
+			} else {
+				reject();
+			}
+		});
 	}
 
 	// fix con scroll top
-	fixScrollTop() {
-		let codeCon = $(this.codeCon);
+	_fixScrollTop() {
+		let codeCon = $(this._codeCon);
 		codeCon.scrollTop = codeCon.scrollHeight;
+	}
+
+	// init
+	init() {
+		let codeCon = $(this._codeCon);
+		if (!codeCon) {
+			console.warn('You should give a real element to options of "codeCon".');
+			return;
+		}
+
+		if (this._index >= this._formatedArray.length) {
+			return;
+		}
+
+		const _current = this._formatedArray[this._index];
+		if (_current.type === 'comment') {
+			this._handlerComment(_current, () => {
+				this._index++;
+				this.init();
+			});
+		} else if (_current.type === 'common') {
+			this._handlerCommon(_current, () => {
+				this._index++;
+				this.init();
+			});
+		}
+	}
+
+	// format css to obj
+	format() {
+		this._formatedArray = format(this.source);
+		return this._formatedArray;
+	}
+
+	// change source text
+	setOptions(options) {
+		this.constructor(options);
+		this.init();
+	}
+
+	// pause _print
+	pause() {
+		this._paused = true;
+	}
+
+	// continue _print
+	continue () {
+		this._paused = false;
+	}
+
+	// toggle _print
+	toggle() {
+		this._paused = !this._paused;
 	}
 };
