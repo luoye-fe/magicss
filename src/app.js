@@ -75,11 +75,16 @@ export default class Magicss {
 	_print(current, ele) {
 		return new Promise((resolve, reject) => {
 			if (current.type === 'comment') {
+				let options = this._assignPrintOption(current.options);
 				noopPromise()
 					.then(() => {
 						let contentArr = split(current.comment, '');
 						let ele = this._insertElement('comment');
-						let options = this._assignPrintOption(current.options);
+						return this._writeCharacterArrToEle(ele, contentArr, options.speed);
+					})
+					.then(() => {
+						let contentArr = ['\n\n'];
+						let ele = this.codeCon;
 						return this._writeCharacterArrToEle(ele, contentArr, options.speed);
 					})
 					.then(() => {
