@@ -10,7 +10,12 @@ var editor = CodeMirror($('#code'), {
 });
 
 var magicss = new Magicss();
+var workCon = $('#work-con');
 
-function () {
-
+function biu() {
+	var val = editor.getValue();
+	magicss.setOptions({
+		source: val,
+		codeCon: workCon
+	});
 }
