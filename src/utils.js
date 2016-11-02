@@ -2,16 +2,11 @@
 // speed:2; -> ['speed','2']
 export const split = (str, tab) => {
 	tab = tab || '';
-	let _curr = str.split(tab);
-	let result = [];
-	_curr.forEach((item) => {
-		let cur = item;
-		if (!cur.replace(/(^\s*)|(\s*$)/g, '').length) {
-			return;
-		}
-		result.push(item);
-	});
-	return result;
+	var _curr = str.split(tab);
+	if (!_curr[_curr.length - 1].replace(/(^\s*)|(\s*$)/g, '').length) {
+		_curr.pop();
+	}
+	return _curr;
 };
 
 export const delay = (ms) => {
