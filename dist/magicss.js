@@ -357,7 +357,7 @@ var Magicss = function () {
 							var ele = _this3._insertElement('comment');
 							return _this3._writeCharacterArrToEle(ele, contentArr, options.speed);
 						}).then(function () {
-							var contentArr = ['\n\n'];
+							var contentArr = ['\n'];
 							var ele = _this3.codeCon;
 							return _this3._writeCharacterArrToEle(ele, contentArr, options.speed);
 						}).then(function () {
