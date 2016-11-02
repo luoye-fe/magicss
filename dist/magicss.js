@@ -267,7 +267,7 @@ var Magicss = function () {
 
 		this.options = options || {};
 		this.source = options.source || '';
-		this._codeCon = options.codeCon || false;
+		this.codeCon = options.codeCon || false;
 		this._paused = false; // 打印状态
 		this._formatedArray = [];
 		this._index = 0;
@@ -331,7 +331,7 @@ var Magicss = function () {
 			var ele = createElement('span', {
 				class: className
 			});
-			append($(this._codeCon), ele);
+			append(this.codeCon, ele);
 			return ele;
 		}
 
@@ -361,7 +361,7 @@ var Magicss = function () {
 							return _this3._writeCharacterArrToEle(ele, contentArr, options.speed);
 						}).then(function () {
 							var contentArr = [' ', '{', '\n'];
-							var ele = $(_this3._codeCon);
+							var ele = _this3.codeCon;
 							return _this3._writeCharacterArrToEle(ele, contentArr, options.speed);
 						}).then(function () {
 							var promises = [];
@@ -373,7 +373,7 @@ var Magicss = function () {
 										resolve();
 										return;
 									}
-									var codeCon = $(_this3._codeCon);
+									var codeCon = _this3.codeCon;
 									_this3._writeCharacterArrToEle(codeCon, [' ', ' ', ' ', ' '], options.speed).then(function () {
 										var contentArr = split(ruleKeys[index], '');
 										var ele = _this3._insertElement('key');
@@ -396,7 +396,7 @@ var Magicss = function () {
 							});
 						}).then(function () {
 							var contentArr = ['}', '\n\n'];
-							var ele = $(_this3._codeCon);
+							var ele = _this3.codeCon;
 							return _this3._writeCharacterArrToEle(ele, contentArr, options.speed);
 						}).then(function () {
 							resolve();
@@ -433,26 +433,13 @@ var Magicss = function () {
 				innserLoop(ele, contentArr, speedMs);
 			});
 		}
-	}, {
-		key: '_handlerNoCodeCon',
-		value: function _handlerNoCodeCon(cb) {
-			var _this5 = this;
-
-			return new Promise(function (resolve, reject) {
-				if ($(_this5.codeCod)) {
-					resolve();
-				} else {
-					reject();
-				}
-			});
-		}
 
 		// fix con scroll top
 
 	}, {
 		key: '_fixScrollTop',
 		value: function _fixScrollTop() {
-			var codeCon = $(this._codeCon);
+			var codeCon = this.codeCon;
 			codeCon.scrollTop = codeCon.scrollHeight;
 		}
 
@@ -461,10 +448,9 @@ var Magicss = function () {
 	}, {
 		key: 'init',
 		value: function init() {
-			var _this6 = this;
+			var _this5 = this;
 
-			var codeCon = $(this._codeCon);
-			if (!codeCon) {
+			if (!this.codeCon) {
 				console.warn('You should give a real element to options of "codeCon".');
 				return;
 			}
@@ -476,13 +462,13 @@ var Magicss = function () {
 			var _current = this._formatedArray[this._index];
 			if (_current.type === 'comment') {
 				this._handlerComment(_current, function () {
-					_this6._index++;
-					_this6.init();
+					_this5._index++;
+					_this5.init();
 				});
 			} else if (_current.type === 'common') {
 				this._handlerCommon(_current, function () {
-					_this6._index++;
-					_this6.init();
+					_this5._index++;
+					_this5.init();
 				});
 			}
 		}
