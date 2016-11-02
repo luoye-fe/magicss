@@ -2,4 +2,556 @@
  * Magicss v1.0.0
  * (c) 2016 luoye <842891024@qq.com>
  */
-!function(e,t){"object"==typeof exports&&"undefined"!=typeof module?module.exports=t():"function"==typeof define&&define.amd?define(t):e.Magicss=t()}(this,function(){"use strict";function e(e){function t(t){return u=t?u+t:++u,l=e.charAt(u),l||""}function n(){return e.charAt(u+1)||""}function r(){var n=e.substr(u),r=n.match(f.comment)[0];for(t(r.length);/\s|\n/.test(l);)r+=l,t();var o={};if(f.ruleOptionInComment.test(r)){var i=r.match(f.ruleOptionInComment)[1];o=a(i)}s.push({type:"comment",comment:r.replace(f.ruleOptionInComment,""),options:o})}function o(){var n=e.substr(u),r=n.match(f.selector)[1];t(r.length);var o=i();s.push({type:"common",selector:r.replace(f.bothWhiteSpace,""),options:o.options,style:o.style})}function i(){var n=e.substr(u),r=n.match(f.allRules)[1],o={},i={};if(t(r.length),f.comment.test(r)){var c=r.match(f.comment)[0].replace(f.whiteSpace,"").replace(f.commentFlag,"").replace(/\n/g,"");o=a(c)}var s=r.replace(f.comment,"").replace(/\n/g,"").replace(/\{|\}/g,"");return i=a(s),{options:o,style:i}}function a(e){var t={},n=c(e,";");return n.forEach(function(e){var n=c(e,":");t[n[0].replace(f.bothWhiteSpace,"")]=n[1].replace(f.bothWhiteSpace,"")}),t}var s=[];e=e||"",e=e.replace(/\r\n|[\r\u2028\u2029]/g,"\n");var u=-1,l=void 0,f={};f.comment=/\/\*[\s\S]+?\*\/|\/\/.+?\n/,f.commentFlag=/\/\/|\/\*|\*\//g,f.ruleOptionInComment=/\{\{(.+?)\}\}/,f.bothWhiteSpace=/^\s+|\s+$/,f.whiteSpace=/\s/g,f.selector=/([\s\S]+?)\{/,f.allRules=/(\{[\s\S]+?\})/;var p=["a","abbr","acronym","address","applet","area","article","aside","audio","b","base","basefont","bdi","bdo","bgsound","big","blink","blockquote","body","br","button","canvas","caption","center","cite","code","col","colgroup","command","content","data","datalist","dd","del","details","dfn","dialog","dir","div","dl","dt","element","em","embed","fieldset","figcaption","figure","font","footer","form","frame","frameset","head","header","hgroup","hr","html","i","iframe","image","img","input","ins","isindex","kbd","keygen","label","legend","li","link","listing","main","map","mark","marquee","menu","menuitem","meta","meter","multicol","nav","nobr","noembed","noframes","noscript","object","ol","optgroup","option","output","p","param","picture","plaintext","pre","progress","q","rp","rt","rtc","ruby","s","samp","script","section","select","shadow","small","source","spacer","span","strike","strong","style","sub","summary","sup","table","tbody","td","template","textarea","tfoot","th","thead","time","title","tr","track","tt","u","ul","var","video","wbr","xmp"],h=["*",".","#","[",":"],m=[];for(m=[].concat(h),p.forEach(function(e){var t=e.substr(0,1);m.includes(t)||m.push(t)}),t();;){if(!l)break;"/"!==l||"*"!==n()&&"/"!==n()?m.includes(l)?o():t():r()}return s}function t(e){return document.querySelector(e)}function n(e,t,n){var r=document.createElement(e),i=void 0;for(i in t)t.hasOwnProperty(i)&&r.setAttribute(i,t[i]);return n&&o(r,n),r}function r(e){for(var t=arguments.length,n=Array(t>1?t-1:0),r=1;r<t;r++)n[r-1]=arguments[r];n.forEach(function(t){e.appendChild(t)})}function o(e,t){i(t,0,e)}function i(e,t){for(var n=arguments.length,r=Array(n>2?n-2:0),o=2;o<n;o++)r[o-2]=arguments[o];r.forEach(function(n){t?"string"==typeof n.textContent?n.textContent=e:n.innerText=e:n.innerHTML=e})}function a(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}var c=function(e,t){t=t||"";var n=e.split(t),r=[];return n.forEach(function(e){""!==e&&r.push(e)}),r},s=function(e){return new Promise(function(t,n){setTimeout(function(){t()},parseInt(e))})},u=function(e){return JSON.parse(JSON.stringify(e))},l=function(){return new Promise(function(e,t){e()})},f=function(){function e(e,t){for(var n=0;n<t.length;n++){var r=t[n];r.enumerable=r.enumerable||!1,r.configurable=!0,"value"in r&&(r.writable=!0),Object.defineProperty(e,r.key,r)}}return function(t,n,r){return n&&e(t.prototype,n),r&&e(t,r),t}}(),p={speed:50,delay:0},h=function(){function i(e){a(this,i),this.options=e||{},this.source=this.options.source||"",this.codeCon=this.options.codeCon||!1,this._paused=!1,this._formatedArray=[],this._index=0,this.format()}return f(i,[{key:"_assignPrintOption",value:function(e){return Object.assign(u(p),e)}},{key:"_handlerComment",value:function(e,t){var n=this,r=this._assignPrintOption(e.options);l().then(function(){return s(r.delay)}).then(function(){return n._print(e)}).then(function(){t()})}},{key:"_handlerCommon",value:function(e,t){var n=this,r=this._assignPrintOption(e.options);l().then(function(){return s(r.delay)}).then(function(){return n._print(e)}).then(function(){t()})}},{key:"_applyStyle",value:function(e,i,a){t("#Magicss-style-con")||r(t("head"),n("style",{id:"Magicss-style-con"}));var c=t("#Magicss-style-con"),s=c.innerHTML;o(c,s+=e+"{"+i+":"+a+"}")}},{key:"_insertElement",value:function(e){var t=n("span",{class:e});return r(this.codeCon,t),t}},{key:"_print",value:function(e,t){var n=this;return new Promise(function(t,r){"comment"===e.type?!function(){var r=n._assignPrintOption(e.options);l().then(function(){var t=c(e.comment,""),o=n._insertElement("comment");return n._writeCharacterArrToEle(o,t,r.speed)}).then(function(){var e=["\n\n"],t=n.codeCon;return n._writeCharacterArrToEle(t,e,r.speed)}).then(function(){t()})}():"common"===e.type&&!function(){var r=n._assignPrintOption(e.options);l().then(function(){var t=c(e.selector,""),o=n._insertElement("selector");return n._writeCharacterArrToEle(o,t,r.speed)}).then(function(){var e=[" ","{","\n"],t=n.codeCon;return n._writeCharacterArrToEle(t,e,r.speed)}).then(function(){var t=Object.keys(e.style),o=0;return new Promise(function(i,a){var s=function a(){if(o>=t.length)return void i();var s=n.codeCon;n._writeCharacterArrToEle(s,[" "," "," "," "],r.speed).then(function(){var e=c(t[o],""),i=n._insertElement("key");return n._writeCharacterArrToEle(i,e,r.speed)}).then(function(){return n._writeCharacterArrToEle(s,[":"," "],r.speed)}).then(function(){var i=c(e.style[t[o]],""),a=n._insertElement("value");return n._writeCharacterArrToEle(a,i,r.speed)}).then(function(){return n._applyStyle(e.selector,t[o],e.style[t[o]]),n._writeCharacterArrToEle(s,[";","\n"],r.speed)}).then(function(){o++,a()})};s()})}).then(function(){var e=["}","\n\n"],t=n.codeCon;return n._writeCharacterArrToEle(t,e,r.speed)}).then(function(){t()})}()})}},{key:"_writeCharacterArrToEle",value:function(e,t,n){var r=this;return new Promise(function(i,a){var c=function e(t,n,a){if(r._fixScrollTop(),!n.length)return void i();var c=t.innerHTML;l().then(function(){return s(a)}).then(function(){r._paused?e(t,n,a):(o(t,c+=n[0]),n.splice(0,1),e(t,n,a))})};c(e,t,n)})}},{key:"_fixScrollTop",value:function(){var e=this.codeCon;e.scrollTop=e.scrollHeight}},{key:"init",value:function(){var e=this;if(!this.codeCon)return void console.warn('You should give a real element to options of "codeCon".');if(!(this._index>=this._formatedArray.length)){var t=this._formatedArray[this._index];"comment"===t.type?this._handlerComment(t,function(){e._index++,e.init()}):"common"===t.type&&this._handlerCommon(t,function(){e._index++,e.init()})}}},{key:"format",value:function(){return this._formatedArray=e(this.source),this._formatedArray}},{key:"setOptions",value:function(e){this.constructor(e),this.init()}},{key:"pause",value:function(){this._paused=!0}},{key:"continue",value:function(){this._paused=!1}},{key:"toggle",value:function(){this._paused=!this._paused}}]),i}();return h});
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+	typeof define === 'function' && define.amd ? define(factory) :
+	(global.Magicss = factory());
+}(this, (function () { 'use strict';
+
+// speed:2;delay:100; -> ['speed:2','delay:100']
+// speed:2; -> ['speed','2']
+var split = function split(str, tab) {
+	tab = tab || '';
+	var _curr = str.split(tab);
+	var result = [];
+	_curr.forEach(function (item) {
+		let cur = item;
+		if (!cur.replace(/(^\s*)|(\s*$)/g, '').length) {
+			return;
+		}
+		result.push(item);
+	});
+	return result;
+};
+
+var delay = function delay(ms) {
+	return new Promise(function (resolve, reject) {
+		setTimeout(function () {
+			resolve();
+		}, parseInt(ms));
+	});
+};
+
+var copyObj = function copyObj(obj) {
+	return JSON.parse(JSON.stringify(obj));
+};
+
+var noopPromise = function noopPromise() {
+	return new Promise(function (resolve, reject) {
+		resolve();
+	});
+};
+
+var objType = function objType(obj) {
+	return Object.prototype.toString.call(obj).match(/\[object\s(.+?)]/)[1];
+};
+
+/**
+ * [format css to Array]
+ * @description 格式化 css 文本，支持注释参数或者规则参数
+ * @param  {[String]} source [css source text]
+ * @return {[Array]}        [array]
+ * @css example
+	\/*
+	 * {{delay:2000}}
+	 * 彩蛋时间到！
+	 *\/
+	html,body{
+		// speed: 200
+	    background: #2d2d2d;
+	}
+
+ * @return example [/ -> \/]
+	[{
+		type: 'comment',
+		comment: '\/* \n * \n * 彩蛋时间到！\n *\/',
+		options: { delay: '2000' }
+	}, {
+		type: 'common',
+		selector: 'html,body',
+		options: { speed: 200 },
+		style: { background: '#2d2d2d' }
+	}]
+ */
+function format$1(source) {
+	var sweetResult = [];
+	source = source || '';
+	source = source.replace(/\r\n|[\r\u2028\u2029]/g, '\n');
+
+	var pos = -1;
+	var ch = void 0;
+
+	var Regx = {};
+	Regx.comment = /\/\*[\s\S]+?\*\/|\/\/.+?\n/; // 注释
+	Regx.commentFlag = /\/\/|\/\*|\*\//g; // 注释 flag
+	Regx.ruleOptionInComment = /\{\{(.+?)\}\}/; // 注释中的参数 {{ ... }}
+	Regx.bothWhiteSpace = /^\s+|\s+$/; // 前后空格
+	Regx.whiteSpace = /\s/g; // 空格
+	Regx.selector = /([\s\S]+?)\{/; // 选择器
+	Regx.allRules = /(\{[\s\S]+?\})/; // css 规则
+
+	/*
+ 	// get all html element list from MDN
+ 	// https://developer.mozilla.org/en-US/docs/Web/HTML/Element
+ 	var test = [...$('#quick-links > ol > li.toggleable.current > ol li a')]
+ 	var ch = '[';
+ 	test.forEach((item) => {ch = ch + "'" + $(item).html().replace(/\&lt\;/g, '').replace(/\&gt\;/g, '') + "', "})
+ 	ch += ']'
+  */
+
+	var allHtmlElement = ['a', 'abbr', 'acronym', 'address', 'applet', 'area', 'article', 'aside', 'audio', 'b', 'base', 'basefont', 'bdi', 'bdo', 'bgsound', 'big', 'blink', 'blockquote', 'body', 'br', 'button', 'canvas', 'caption', 'center', 'cite', 'code', 'col', 'colgroup', 'command', 'content', 'data', 'datalist', 'dd', 'del', 'details', 'dfn', 'dialog', 'dir', 'div', 'dl', 'dt', 'element', 'em', 'embed', 'fieldset', 'figcaption', 'figure', 'font', 'footer', 'form', 'frame', 'frameset', 'head', 'header', 'hgroup', 'hr', 'html', 'i', 'iframe', 'image', 'img', 'input', 'ins', 'isindex', 'kbd', 'keygen', 'label', 'legend', 'li', 'link', 'listing', 'main', 'map', 'mark', 'marquee', 'menu', 'menuitem', 'meta', 'meter', 'multicol', 'nav', 'nobr', 'noembed', 'noframes', 'noscript', 'object', 'ol', 'optgroup', 'option', 'output', 'p', 'param', 'picture', 'plaintext', 'pre', 'progress', 'q', 'rp', 'rt', 'rtc', 'ruby', 's', 'samp', 'script', 'section', 'select', 'shadow', 'small', 'source', 'spacer', 'span', 'strike', 'strong', 'style', 'sub', 'summary', 'sup', 'table', 'tbody', 'td', 'template', 'textarea', 'tfoot', 'th', 'thead', 'time', 'title', 'tr', 'track', 'tt', 'u', 'ul', 'var', 'video', 'wbr', 'xmp'];
+	var allCssSelector = ['*', '.', '#', '[', ':'];
+	var allSelectorFirstCh = [];
+	allSelectorFirstCh = [].concat(allCssSelector);
+	// get all html element list first character
+	allHtmlElement.forEach(function (item) {
+		var firstCh = item.substr(0, 1);
+		if (!allSelectorFirstCh.includes(firstCh)) {
+			allSelectorFirstCh.push(firstCh);
+		}
+	});
+
+	// 获取当前位置字符
+	function next(length) {
+		pos = length ? pos + length : ++pos;
+		ch = source.charAt(pos);
+		return ch || '';
+	}
+
+	// 获取当前位置的下一个字符
+	function nnext() {
+		return source.charAt(pos + 1) || '';
+	}
+
+	// 处理注释
+	function handleComment() {
+		var prePos = pos;
+		var _source = source.substr(pos);
+		var commentStr = _source.match(Regx.comment)[0]; // 匹配 chunkComment 和 lineComment
+		next(commentStr.length);
+		while (/\s|\n/.test(ch)) {
+			commentStr += ch;
+			next();
+		}
+		// pos = prePos;
+		var resultOptions = {};
+		if (Regx.ruleOptionInComment.test(commentStr)) {
+			var optionsStr = commentStr.match(Regx.ruleOptionInComment)[1];
+			resultOptions = splitSameStyleStr(optionsStr);
+		}
+		sweetResult.push({
+			type: 'comment',
+			comment: commentStr.replace(Regx.ruleOptionInComment, ''),
+			options: resultOptions
+		});
+	}
+
+	// 处理选择器
+	function handleSelector() {
+		var _source = source.substr(pos);
+		var selectorStr = _source.match(Regx.selector)[1];
+		next(selectorStr.length);
+		var resultObj = handleAllRules();
+		sweetResult.push({
+			type: 'common',
+			selector: selectorStr.replace(Regx.bothWhiteSpace, ''), // 去掉选择器前后空格
+			options: resultObj.options,
+			style: resultObj.style
+		});
+	}
+
+	// 处理样式
+	function handleAllRules() {
+		var _source = source.substr(pos);
+		var allRulesStr = _source.match(Regx.allRules)[1];
+		var resultOptions = {};
+		var resultStyle = {};
+		next(allRulesStr.length);
+		if (Regx.comment.test(allRulesStr)) {
+			var optionsStr = allRulesStr.match(Regx.comment)[0].replace(Regx.whiteSpace, '').replace(Regx.commentFlag, '').replace(/\n/g, '');
+			resultOptions = splitSameStyleStr(optionsStr);
+		}
+		var styleStr = allRulesStr.replace(Regx.comment, '').replace(/\n/g, '').replace(/\{|\}/g, '');
+		resultStyle = splitSameStyleStr(styleStr);
+		return {
+			options: resultOptions,
+			style: resultStyle
+		};
+	}
+
+	// split "a:1;b:2" -> {a: 1, b: 2}
+	function splitSameStyleStr(str) {
+		var result = {};
+		var _cur1 = split(str, ';');
+		console.log(_cur1);
+		_cur1.forEach(function (item) {
+			var _cur2 = split(item, ':');
+			result[_cur2[0].replace(Regx.bothWhiteSpace, '')] = _cur2[1].replace(Regx.bothWhiteSpace, '');
+		});
+		return result;
+	}
+
+	next();
+	while (true) {
+		if (!ch) {
+			break;
+		} else if (ch === '/' && (nnext() === '*' || nnext() === '/')) {
+			// comment
+			handleComment();
+		} else if (allSelectorFirstCh.includes(ch)) {
+			// selector
+			handleSelector();
+		} else {
+			next();
+		}
+	}
+
+	return sweetResult;
+}
+
+function $(selector) {
+	return document.querySelector(selector);
+}
+
+function createElement(tag, attrs, content) {
+	var el = document.createElement(tag);
+	var i = void 0;
+	for (i in attrs) {
+		if (attrs.hasOwnProperty(i)) {
+			el.setAttribute(i, attrs[i]);
+		}
+	}
+	if (content) {
+		html(el, content);
+	}
+	return el;
+}
+
+function append(parent) {
+	for (var _len = arguments.length, eles = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+		eles[_key - 1] = arguments[_key];
+	}
+
+	eles.forEach(function (ele) {
+		parent.appendChild(ele);
+	});
+}
+
+function html(eles, html) {
+	_put(html, 0, eles);
+}
+
+function _put(string, type) {
+	for (var _len2 = arguments.length, eles = Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
+		eles[_key2 - 2] = arguments[_key2];
+	}
+
+	eles.forEach(function (ele) {
+		if (type) {
+			if (typeof ele.textContent === 'string') {
+				ele.textContent = string;
+			} else {
+				ele.innerText = string;
+			}
+		} else {
+			ele.innerHTML = string;
+		}
+	});
+}
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var defaultPrintOptions = {
+	speed: 50, // ms/每字符
+	delay: 0
+};
+
+var Magicss = function () {
+	function Magicss(options) {
+		_classCallCheck(this, Magicss);
+
+		this.options = options || {};
+		this.source = this.options.source || '';
+		this.codeCon = this.options.codeCon || false;
+		this._paused = false; // 打印状态
+		this._begin = false; // process
+		this._formatedArray = [];
+		this._index = 0;
+		this.format();
+	}
+
+	_createClass(Magicss, [{
+		key: '_assignPrintOption',
+		value: function _assignPrintOption(options) {
+			return Object.assign(copyObj(defaultPrintOptions), options);
+		}
+	}, {
+		key: '_handlerComment',
+		value: function _handlerComment(current, cb) {
+			var _this = this;
+
+			var options = this._assignPrintOption(current.options);
+			noopPromise().then(function () {
+				return delay(options.delay);
+			}).then(function () {
+				return _this._print(current);
+			}).then(function () {
+				cb();
+			});
+		}
+	}, {
+		key: '_handlerCommon',
+		value: function _handlerCommon(current, cb) {
+			var _this2 = this;
+
+			var options = this._assignPrintOption(current.options);
+			noopPromise().then(function () {
+				return delay(options.delay);
+			}).then(function () {
+				return _this2._print(current);
+			}).then(function () {
+				cb();
+			});
+		}
+
+		// apply style
+
+	}, {
+		key: '_applyStyle',
+		value: function _applyStyle(selector, styleKey, styleValue) {
+			if (!$('#Magicss-style-con')) {
+				append($('head'), createElement('style', {
+					id: 'Magicss-style-con'
+				}));
+			}
+			var styleCon = $('#Magicss-style-con');
+			var styleConHTML = styleCon.innerHTML;
+			html(styleCon, styleConHTML += selector + '{' + styleKey + ':' + styleValue + '}');
+		}
+
+		// insert element
+
+	}, {
+		key: '_insertElement',
+		value: function _insertElement(className) {
+			var ele = createElement('span', {
+				class: className
+			});
+			append(this.codeCon, ele);
+			return ele;
+		}
+
+		// print source text in ele
+
+	}, {
+		key: '_print',
+		value: function _print(current, ele) {
+			var _this3 = this;
+
+			this._onChange('processing', current);
+			return new Promise(function (resolve, reject) {
+				if (current.type === 'comment') {
+					(function () {
+						var options = _this3._assignPrintOption(current.options);
+						noopPromise().then(function () {
+							var contentArr = split(current.comment, '');
+							var ele = _this3._insertElement('comment');
+							return _this3._writeCharacterArrToEle(ele, contentArr, options.speed);
+						}).then(function () {
+							var contentArr = ['\n'];
+							var ele = _this3.codeCon;
+							return _this3._writeCharacterArrToEle(ele, contentArr, options.speed);
+						}).then(function () {
+							resolve();
+						});
+					})();
+				} else if (current.type === 'common') {
+					(function () {
+						var options = _this3._assignPrintOption(current.options);
+						noopPromise().then(function () {
+							var contentArr = split(current.selector, '');
+							var ele = _this3._insertElement('selector');
+							return _this3._writeCharacterArrToEle(ele, contentArr, options.speed);
+						}).then(function () {
+							var contentArr = [' ', '{', '\n'];
+							var ele = _this3.codeCon;
+							return _this3._writeCharacterArrToEle(ele, contentArr, options.speed);
+						}).then(function () {
+							var promises = [];
+							var ruleKeys = Object.keys(current.style);
+							var index = 0;
+							return new Promise(function (resolve, reject) {
+								var iterateRule = function iterateRule() {
+									if (index >= ruleKeys.length) {
+										resolve();
+										return;
+									}
+									var codeCon = _this3.codeCon;
+									_this3._writeCharacterArrToEle(codeCon, [' ', ' ', ' ', ' '], options.speed).then(function () {
+										var contentArr = split(ruleKeys[index], '');
+										var ele = _this3._insertElement('key');
+										return _this3._writeCharacterArrToEle(ele, contentArr, options.speed);
+									}).then(function () {
+										return _this3._writeCharacterArrToEle(codeCon, [':', ' '], options.speed);
+									}).then(function () {
+										var contentArr = split(current.style[ruleKeys[index]], '');
+										var ele = _this3._insertElement('value');
+										return _this3._writeCharacterArrToEle(ele, contentArr, options.speed);
+									}).then(function () {
+										_this3._applyStyle(current.selector, ruleKeys[index], current.style[ruleKeys[index]]);
+										return _this3._writeCharacterArrToEle(codeCon, [';', '\n'], options.speed);
+									}).then(function () {
+										index++;
+										iterateRule();
+									});
+								};
+								iterateRule();
+							});
+						}).then(function () {
+							var contentArr = ['}', '\n\n'];
+							var ele = _this3.codeCon;
+							return _this3._writeCharacterArrToEle(ele, contentArr, options.speed);
+						}).then(function () {
+							resolve();
+						});
+					})();
+				}
+			});
+		}
+	}, {
+		key: '_writeCharacterArrToEle',
+		value: function _writeCharacterArrToEle(ele, contentArr, speedMs) {
+			var _this4 = this;
+
+			return new Promise(function (resolve, reject) {
+				var innserLoop = function innserLoop(ele, contentArr, speedMs) {
+					_this4._fixScrollTop();
+					if (!contentArr.length) {
+						resolve();
+						return;
+					}
+					var currentHTML = ele.innerHTML;
+					noopPromise().then(function () {
+						return delay(speedMs);
+					}).then(function () {
+						if (!_this4._paused) {
+							html(ele, currentHTML += contentArr[0]);
+							contentArr.splice(0, 1);
+							innserLoop(ele, contentArr, speedMs);
+						} else {
+							innserLoop(ele, contentArr, speedMs);
+						}
+					});
+				};
+				innserLoop(ele, contentArr, speedMs);
+			});
+		}
+
+		// fix con scroll top
+
+	}, {
+		key: '_fixScrollTop',
+		value: function _fixScrollTop() {
+			var codeCon = this.codeCon;
+			codeCon.scrollTop = codeCon.scrollHeight;
+		}
+
+		// print a new obj or begin or paused or processing or end trigger this func
+
+	}, {
+		key: '_onChange',
+		value: function _onChange(process, argvs) {
+			if (objType(this.options.onChange) !== 'Function') {
+				return;
+			}
+			this.options.onChange(process, argvs);
+		}
+
+		// init
+
+	}, {
+		key: 'init',
+		value: function init() {
+			var _this5 = this;
+
+			if (!this.codeCon) {
+				console.warn('You should give a real element to options of "codeCon".');
+				return;
+			}
+
+			if (!this._begin) {
+				this._onChange('begin');
+				this._begin = true;
+			}
+
+			if (this._index >= this._formatedArray.length) {
+				this._begin = false;
+				this._onChange('end');
+				return;
+			}
+
+			var _current = this._formatedArray[this._index];
+			if (_current.type === 'comment') {
+				this._handlerComment(_current, function () {
+					_this5._index++;
+					_this5.init();
+				});
+			} else if (_current.type === 'common') {
+				this._handlerCommon(_current, function () {
+					_this5._index++;
+					_this5.init();
+				});
+			}
+		}
+
+		// format css to obj
+
+	}, {
+		key: 'format',
+		value: function format() {
+			this._formatedArray = format$1(this.source);
+			return this._formatedArray;
+		}
+
+		// change source text
+
+	}, {
+		key: 'setOptions',
+		value: function setOptions(options) {
+			this.constructor(options);
+			this.init();
+		}
+
+		// pause _print
+
+	}, {
+		key: 'pause',
+		value: function pause() {
+			this._paused = true;
+		}
+
+		// continue _print
+
+	}, {
+		key: 'continue',
+		value: function _continue() {
+			this._paused = false;
+		}
+
+		// toggle _print
+
+	}, {
+		key: 'toggle',
+		value: function toggle() {
+			this._paused = !this._paused;
+		}
+	}]);
+
+	return Magicss;
+}();
+
+return Magicss;
+
+})));
