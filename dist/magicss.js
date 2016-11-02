@@ -344,14 +344,20 @@ var Magicss = function () {
 
 			return new Promise(function (resolve, reject) {
 				if (current.type === 'comment') {
-					noopPromise().then(function () {
-						var contentArr = split(current.comment, '');
-						var ele = _this3._insertElement('comment');
+					(function () {
 						var options = _this3._assignPrintOption(current.options);
-						return _this3._writeCharacterArrToEle(ele, contentArr, options.speed);
-					}).then(function () {
-						resolve();
-					});
+						noopPromise().then(function () {
+							var contentArr = split(current.comment, '');
+							var ele = _this3._insertElement('comment');
+							return _this3._writeCharacterArrToEle(ele, contentArr, options.speed);
+						}).then(function () {
+							var contentArr = ['\n\n'];
+							var ele = _this3.codeCon;
+							return _this3._writeCharacterArrToEle(ele, contentArr, options.speed);
+						}).then(function () {
+							resolve();
+						});
+					})();
 				} else if (current.type === 'common') {
 					(function () {
 						var options = _this3._assignPrintOption(current.options);
