@@ -17,8 +17,4 @@ var baymax = new Magicss({
 	}
 });
 
-// console.log(baymax.format());
-
 baymax.init();
-
-// Baymax.print()

@@ -85,7 +85,7 @@ export default class Magicss {
 						return this._writeCharacterArrToEle(ele, contentArr, options.speed);
 					})
 					.then(() => {
-						let contentArr = ['\n\n'];
+						let contentArr = ['\n'];
 						let ele = this.codeCon;
 						return this._writeCharacterArrToEle(ele, contentArr, options.speed);
 					})
