@@ -28,7 +28,20 @@ window.addEventListener('keydown', function(e) {
 });
 
 function init() {
-	
+	magicss.setOptions({
+		source: 
+`
+* {
+	transition: all ease 0.2s;
+}
+`,
+		codeCon: workCon,
+		onChange: function(process, argvs) {
+			if (process === 'end') {
+				// applyCodeStyle();
+			}
+		}
+	})
 }
 
 function applyCodeStyle() {
@@ -2121,6 +2134,6 @@ function changeBodybg() {
 
 // function 
 
-
+init();
 // applyCodeStyle();
 // changeBodybg();

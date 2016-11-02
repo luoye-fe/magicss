@@ -13,15 +13,10 @@
 var split = function split(str, tab) {
 	tab = tab || '';
 	var _curr = str.split(tab);
-	var result = [];
-	_curr.forEach(function (item) {
-		let cur = item;
-		if (!cur.replace(/(^\s*)|(\s*$)/g, '').length) {
-			return;
-		}
-		result.push(item);
-	});
-	return result;
+	if (!_curr[_curr.length - 1].replace(/(^\s*)|(\s*$)/g, '').length) {
+		_curr.pop();
+	}
+	return _curr;
 };
 
 var delay = function delay(ms) {
@@ -183,7 +178,6 @@ function format$1(source) {
 	function splitSameStyleStr(str) {
 		var result = {};
 		var _cur1 = split(str, ';');
-		console.log(_cur1);
 		_cur1.forEach(function (item) {
 			var _cur2 = split(item, ':');
 			result[_cur2[0].replace(Regx.bothWhiteSpace, '')] = _cur2[1].replace(Regx.bothWhiteSpace, '');
@@ -205,7 +199,6 @@ function format$1(source) {
 			next();
 		}
 	}
-
 	return sweetResult;
 }
 
