@@ -5,9 +5,11 @@ export const split = (str, tab) => {
 	let _curr = str.split(tab);
 	let result = [];
 	_curr.forEach((item) => {
-		if (item !== '') {
-			result.push(item);
+		let cur = item;
+		if (!cur.replace(/(^\s*)|(\s*$)/g, '').length) {
+			return;
 		}
+		result.push(item);
 	});
 	return result;
 };
