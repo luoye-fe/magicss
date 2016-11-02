@@ -18,4 +18,12 @@ function biu() {
 		source: val,
 		codeCon: workCon
 	});
+	editor.setValue('');
 }
+
+window.addEventListener('keydown', function(e) {
+	if (e.metaKey && e.keyCode === 13 && editor.hasFocus()) {
+		biu();
+	}
+});
+

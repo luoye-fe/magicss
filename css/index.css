@@ -4,6 +4,7 @@
 	height: 300px;
 	right: 5px;
 	bottom: 5px;
+	border: 1px solid #fff;
 }
 .code-input-con button {
 	position: absolute;
@@ -13,7 +14,7 @@
 	right: 0;
 	top: -29px;
 	cursor: pointer;
-	border: 1px solid #fff;
+	border: 1px solid #ccc;
 	border-radius: 4px;
 	color: #fff;
 	background-color: rgba(138, 220, 74, 0.8);
@@ -28,6 +29,7 @@
 }
 
 #work-con {
+	margin: 0;
     position: fixed;
     right: 5px;
     top: 5px;
