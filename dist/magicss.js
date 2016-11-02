@@ -1,7 +1,3 @@
-/*
- * Magicss v1.0.0
- * (c) 2016 luoye <842891024@qq.com>
- */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
@@ -40,33 +36,10 @@ var noopPromise = function noopPromise() {
 	});
 };
 
-/**
- * [format css to Array]
- * @description 格式化 css 文本，支持注释参数或者规则参数
- * @param  {[String]} source [css source text]
- * @return {[Array]}        [array]
- * @css example
-	\/*
-	 * {{delay:2000}}
-	 * 彩蛋时间到！
-	 *\/
-	html,body{
-		// speed: 200
-	    background: #2d2d2d;
-	}
+var objType = function objType(obj) {
+	return Object.prototype.toString.call(obj).match(/\[object\s(.+?)]/)[1];
+};
 
- * @return example [/ -> \/]
-	[{
-		type: 'comment',
-		comment: '\/* \n * \n * 彩蛋时间到！\n *\/',
-		options: { delay: '2000' }
-	}, {
-		type: 'common',
-		selector: 'html,body',
-		options: { speed: 200 },
-		style: { background: '#2d2d2d' }
-	}]
- */
 function format$1(source) {
 	var sweetResult = [];
 	source = source || '';
@@ -269,6 +242,7 @@ var Magicss = function () {
 		this.source = this.options.source || '';
 		this.codeCon = this.options.codeCon || false;
 		this._paused = false; // 打印状态
+		this._begin = false; // process
 		this._formatedArray = [];
 		this._index = 0;
 		this.format();
@@ -342,6 +316,7 @@ var Magicss = function () {
 		value: function _print(current, ele) {
 			var _this3 = this;
 
+			this._onChange('processing', current);
 			return new Promise(function (resolve, reject) {
 				if (current.type === 'comment') {
 					(function () {
@@ -449,6 +424,17 @@ var Magicss = function () {
 			codeCon.scrollTop = codeCon.scrollHeight;
 		}
 
+		// print a new obj or begin or paused or processing or end trigger this func
+
+	}, {
+		key: '_onChange',
+		value: function _onChange(process, argvs) {
+			if (objType(this.options.onChange) !== 'Function') {
+				return;
+			}
+			this.options.onChange(process, argvs);
+		}
+
 		// init
 
 	}, {
@@ -461,7 +447,14 @@ var Magicss = function () {
 				return;
 			}
 
+			if (!this._begin) {
+				this._onChange('begin');
+				this._begin = true;
+			}
+
 			if (this._index >= this._formatedArray.length) {
+				this._begin = false;
+				this._onChange('end');
 				return;
 			}
 
@@ -528,3 +521,4 @@ var Magicss = function () {
 return Magicss;
 
 })));
+//# sourceMappingURL=magicss.js.map

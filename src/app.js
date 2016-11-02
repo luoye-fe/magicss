@@ -1,8 +1,8 @@
 import format from './format-css.js';
 
-import { createElement, append, html, text, $ } from './dom.js';
+import { createElement, append, html, $ } from './dom.js';
 
-import { delay, copyObj, noopPromise, split } from './utils.js';
+import { delay, copyObj, noopPromise, split, objType } from './utils.js';
 
 const defaultPrintOptions = {
 	speed: 50, // ms/每字符
@@ -15,6 +15,7 @@ export default class Magicss {
 		this.source = this.options.source || '';
 		this.codeCon = this.options.codeCon || false;
 		this._paused = false; // 打印状态
+		this._begin = false; // process
 		this._formatedArray = [];
 		this._index = 0;
 		this.format();
@@ -73,6 +74,7 @@ export default class Magicss {
 
 	// print source text in ele
 	_print(current, ele) {
+		this._onChange('processing', current);
 		return new Promise((resolve, reject) => {
 			if (current.type === 'comment') {
 				let options = this._assignPrintOption(current.options);
@@ -185,6 +187,14 @@ export default class Magicss {
 		codeCon.scrollTop = codeCon.scrollHeight;
 	}
 
+	// print a new obj or begin or paused or processing or end trigger this func
+	_onChange(process, argvs) {
+		if (objType(this.options.onChange) !== 'Function') {
+			return;
+		}
+		this.options.onChange(process, argvs);
+	}
+
 	// init
 	init() {
 		if (!this.codeCon) {
@@ -192,7 +202,14 @@ export default class Magicss {
 			return;
 		}
 
+		if (!this._begin) {
+			this._onChange('begin');
+			this._begin = true;
+		}
+
 		if (this._index >= this._formatedArray.length) {
+			this._begin = false;
+			this._onChange('end');
 			return;
 		}
 

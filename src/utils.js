@@ -29,3 +29,7 @@ export const noopPromise = () => {
 		resolve();
 	});
 };
+
+export const objType = (obj) => {
+	return Object.prototype.toString.call(obj).match(/\[object\s(.+?)]/)[1];
+};
