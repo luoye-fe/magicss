@@ -308,11 +308,8 @@ html, body {
 
 `;
 
-var Baymax = new Magicss({
-	source: sourceText,
-	codeCon: '#work_con'
-});
-console.log(Baymax.format());
-Baymax.init();
+var Baymax = new Magicss();
+// console.log(Baymax.format());
+// Baymax.init();
 
 // Baymax.print()

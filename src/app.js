@@ -12,8 +12,8 @@ const defaultPrintOptions = {
 export default class Magicss {
 	constructor(options) {
 		this.options = options || {};
-		this.source = options.source || '';
-		this.codeCon = options.codeCon || false;
+		this.source = this.options.source || '';
+		this.codeCon = this.options.codeCon || false;
 		this._paused = false; // 打印状态
 		this._formatedArray = [];
 		this._index = 0;
