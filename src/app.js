@@ -13,7 +13,7 @@ export default class Magicss {
 	constructor(options) {
 		this.options = options || {};
 		this.source = options.source || '';
-		this._codeCon = options.codeCon || false;
+		this.codeCon = options.codeCon || false;
 		this._paused = false; // 打印状态
 		this._formatedArray = [];
 		this._index = 0;
@@ -67,7 +67,7 @@ export default class Magicss {
 		let ele = createElement('span', {
 			class: className
 		});
-		append($(this._codeCon), ele);
+		append($(this.codeCon), ele);
 		return ele;
 	}
 
@@ -95,7 +95,7 @@ export default class Magicss {
 					})
 					.then(() => {
 						let contentArr = [' ', '{', '\n'];
-						let ele = $(this._codeCon);
+						let ele = $(this.codeCon);
 						return this._writeCharacterArrToEle(ele, contentArr, options.speed);
 					})
 					.then(() => {
@@ -108,7 +108,7 @@ export default class Magicss {
 									resolve();
 									return;
 								}
-								let codeCon = $(this._codeCon);
+								let codeCon = $(this.codeCon);
 								this._writeCharacterArrToEle(codeCon, [' ', ' ', ' ', ' '], options.speed)
 									.then(() => {
 										let contentArr = split(ruleKeys[index], '');
@@ -137,7 +137,7 @@ export default class Magicss {
 					})
 					.then(() => {
 						let contentArr = ['}', '\n\n'];
-						let ele = $(this._codeCon);
+						let ele = $(this.codeCon);
 						return this._writeCharacterArrToEle(ele, contentArr, options.speed);
 					})
 					.then(() => {
@@ -176,13 +176,13 @@ export default class Magicss {
 
 	// fix con scroll top
 	_fixScrollTop() {
-		let codeCon = $(this._codeCon);
+		let codeCon = $(this.codeCon);
 		codeCon.scrollTop = codeCon.scrollHeight;
 	}
 
 	// init
 	init() {
-		let codeCon = $(this._codeCon);
+		let codeCon = $(this.codeCon);
 		if (!codeCon) {
 			console.warn('You should give a real element to options of "codeCon".');
 			return;
