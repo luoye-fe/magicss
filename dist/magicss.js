@@ -13,13 +13,10 @@
 var split = function split(str, tab) {
 	tab = tab || '';
 	var _curr = str.split(tab);
-	var result = [];
-	_curr.forEach(function (item) {
-		if (item !== '') {
-			result.push(item);
-		}
-	});
-	return result;
+	if (!_curr[_curr.length - 1].replace(/(^\s*)|(\s*$)/g, '').length) {
+		_curr.pop();
+	}
+	return _curr;
 };
 
 var delay = function delay(ms) {
