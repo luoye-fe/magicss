@@ -99,6 +99,6 @@ function applyCodeStyle() {
 
 // function 
 
-init();
+// init();
 // applyCodeStyle();
 // changeBodybg();

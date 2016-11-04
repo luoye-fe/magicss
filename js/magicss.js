@@ -199,6 +199,7 @@ function format$1(source) {
 			next();
 		}
 	}
+
 	return sweetResult;
 }
 
