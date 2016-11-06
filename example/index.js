@@ -1,11 +1,18 @@
 /* global Magicss */
 var sourceText = `
+/* global Magicss */
 * {
     -webkit-transition: all ease 1s;
 }
 html, body {
     background: #2d2d2d;
 }
+/* global Magicss */
+/* global Magicss */
+/* global Magicss */
+/* global Magicss */
+/* global Magicss */
+/* global Magicss */
 `;
 
 var baymax = new Magicss({

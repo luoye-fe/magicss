@@ -15,7 +15,7 @@ export default class Magicss {
 		this.source = this.options.source || '';
 		this.codeCon = this.options.codeCon || false;
 		this._paused = false; // 打印状态
-		this._begin = false; // process
+		this._status = 'nope'; // nope -> start -> processing -> stop -> nope -> ...
 		this._formatedArray = [];
 		this._index = 0;
 		this.format();
@@ -25,30 +25,22 @@ export default class Magicss {
 		return Object.assign(copyObj(defaultPrintOptions), options);
 	}
 
-	_handlerComment(current, cb) {
-		let options = this._assignPrintOption(current.options);
-		noopPromise()
-			.then(() => {
-				return delay(options.delay);
-			})
-			.then(() => {
-				return this._print(current);
-			}).then(() => {
-				cb();
-			});
-	}
-
-	_handlerCommon(current, cb) {
-		let options = this._assignPrintOption(current.options);
-		noopPromise()
-			.then(() => {
-				return delay(options.delay);
-			})
-			.then(() => {
-				return this._print(current);
-			}).then(() => {
-				cb();
-			});
+	_handler(current) {
+		return new Promise((resolve, reject) => {
+			if (this._status === 'nope') {
+				resolve();
+			}
+			let options = this._assignPrintOption(current.options);
+			noopPromise()
+				.then(() => {
+					return delay(options.delay);
+				})
+				.then(() => {
+					return this._print(current);
+				}).then(() => {
+					resolve();
+				});
+		});
 	}
 
 	// apply style
@@ -77,33 +69,31 @@ export default class Magicss {
 		this._onChange('processing', current);
 		return new Promise((resolve, reject) => {
 			if (current.type === 'comment') {
-				let options = this._assignPrintOption(current.options);
 				noopPromise()
 					.then(() => {
 						let contentArr = split(current.comment, '');
 						let ele = this._insertElement('comment');
-						return this._writeCharacterArrToEle(ele, contentArr, options.speed);
+						return this._writeCharacterArrToEle(ele, contentArr, current);
 					})
 					.then(() => {
 						let contentArr = ['\n'];
 						let ele = this.codeCon;
-						return this._writeCharacterArrToEle(ele, contentArr, options.speed);
+						return this._writeCharacterArrToEle(ele, contentArr, current);
 					})
 					.then(() => {
 						resolve();
 					});
 			} else if (current.type === 'common') {
-				let options = this._assignPrintOption(current.options);
 				noopPromise()
 					.then(() => {
 						let contentArr = split(current.selector, '');
 						let ele = this._insertElement('selector');
-						return this._writeCharacterArrToEle(ele, contentArr, options.speed);
+						return this._writeCharacterArrToEle(ele, contentArr, current);
 					})
 					.then(() => {
 						let contentArr = [' ', '{', '\n'];
 						let ele = this.codeCon;
-						return this._writeCharacterArrToEle(ele, contentArr, options.speed);
+						return this._writeCharacterArrToEle(ele, contentArr, current);
 					})
 					.then(() => {
 						let promises = [];
@@ -116,23 +106,22 @@ export default class Magicss {
 									return;
 								}
 								let codeCon = this.codeCon;
-								this._writeCharacterArrToEle(codeCon, [' ', ' ', ' ', ' '], options.speed)
+								this._writeCharacterArrToEle(codeCon, [' ', ' ', ' ', ' '], current)
 									.then(() => {
 										let contentArr = split(ruleKeys[index], '');
 										let ele = this._insertElement('key');
-										return this._writeCharacterArrToEle(ele, contentArr, options.speed);
+										return this._writeCharacterArrToEle(ele, contentArr, current);
 									})
 									.then(() => {
-										return this._writeCharacterArrToEle(codeCon, [':', ' '], options.speed);
+										return this._writeCharacterArrToEle(codeCon, [':', ' '], current);
 									})
 									.then(() => {
 										let contentArr = split(current.style[ruleKeys[index]], '');
 										let ele = this._insertElement('value');
-										return this._writeCharacterArrToEle(ele, contentArr, options.speed);
+										return this._writeCharacterArrToEle(ele, contentArr, current);
 									})
 									.then(() => {
-										this._applyStyle(current.selector, ruleKeys[index], current.style[ruleKeys[index]]);
-										return this._writeCharacterArrToEle(codeCon, [';', '\n'], options.speed);
+										return this._writeCharacterArrToEle(codeCon, [';', '\n'], current, index);
 									})
 									.then(() => {
 										index++;
@@ -145,7 +134,7 @@ export default class Magicss {
 					.then(() => {
 						let contentArr = ['}', '\n\n'];
 						let ele = this.codeCon;
-						return this._writeCharacterArrToEle(ele, contentArr, options.speed);
+						return this._writeCharacterArrToEle(ele, contentArr, current);
 					})
 					.then(() => {
 						resolve();
@@ -154,30 +143,35 @@ export default class Magicss {
 		});
 	}
 
-	_writeCharacterArrToEle(ele, contentArr, speedMs) {
+	_writeCharacterArrToEle(ele, contentArr, current, index) {
+		let options = this._assignPrintOption(current.options);
 		return new Promise((resolve, reject) => {
-			const innserLoop = (ele, contentArr, speedMs) => {
+			const innserLoop = (ele, contentArr, current) => {
 				this._fixScrollTop();
-				if (!contentArr.length) {
+				if (!contentArr.length || this._status === 'nope') {
 					resolve();
 					return;
 				}
 				let currentHTML = ele.innerHTML;
 				noopPromise()
 					.then(() => {
-						return delay(speedMs);
+						return delay(options.speed);
 					})
 					.then(() => {
 						if (!this._paused) {
+							if (current.type === 'common' && contentArr[0] === ';') {
+								const ruleKeys = Object.keys(current.style);
+								this._applyStyle(current.selector, ruleKeys[index], current.style[ruleKeys[index]]);
+							}
 							html(ele, currentHTML += contentArr[0]);
 							contentArr.splice(0, 1);
-							innserLoop(ele, contentArr, speedMs);
+							innserLoop(ele, contentArr, current);
 						} else {
-							innserLoop(ele, contentArr, speedMs);
+							innserLoop(ele, contentArr, current);
 						}
 					});
 			};
-			innserLoop(ele, contentArr, speedMs);
+			innserLoop(ele, contentArr, current);
 		});
 	}
 
@@ -187,7 +181,7 @@ export default class Magicss {
 		codeCon.scrollTop = codeCon.scrollHeight;
 	}
 
-	// print a new obj or begin or paused or processing or end trigger this func
+	// print a new obj or start or paused or processing or stop trigger this func
 	_onChange(process, argvs) {
 		if (objType(this.options.onChange) !== 'Function') {
 			return;
@@ -202,35 +196,29 @@ export default class Magicss {
 			return;
 		}
 
-		if (!this._begin) {
-			this._onChange('begin');
-			this._begin = true;
+		if (this._status === 'nope') {
+			this._status = 'start';
+			this._onChange('start');
 		}
 
 		if (this._index >= this._formatedArray.length) {
-			this._begin = false;
-			this._onChange('end');
+			this._status = 'stop';
+			this._onChange('stop');
+			this.constructor(this.options);
 			return;
 		}
 
 		const _current = this._formatedArray[this._index];
-		if (_current.type === 'comment') {
-			this._handlerComment(_current, () => {
+		this._status = 'processing';
+		this._handler(_current)
+			.then(() => {
 				this._index++;
 				this.init();
 			});
-		} else if (_current.type === 'common') {
-			this._handlerCommon(_current, () => {
-				this._index++;
-				this.init();
-			});
-		}
 	}
 
 	// format css to obj
 	format() {
-		// force stop
-		this._index = this._formatedArray.length;
 		this._formatedArray = format(this.source);
 		return this._formatedArray;
 	}
@@ -238,7 +226,7 @@ export default class Magicss {
 	// change source text
 	setOptions(options) {
 		this.constructor(options);
-		this.init();
+		// this.init();
 	}
 
 	// pause _print

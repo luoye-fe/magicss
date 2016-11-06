@@ -1,7 +1,3 @@
-/*
- * Magicss v1.0.0
- * (c) 2016 luoye <842891024@qq.com>
- */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
@@ -41,33 +37,6 @@ var objType = function objType(obj) {
 	return Object.prototype.toString.call(obj).match(/\[object\s(.+?)]/)[1];
 };
 
-/**
- * [format css to Array]
- * @description 格式化 css 文本，支持注释参数或者规则参数
- * @param  {[String]} source [css source text]
- * @return {[Array]}        [array]
- * @css example
-	\/*
-	 * {{delay:2000}}
-	 * 彩蛋时间到！
-	 *\/
-	html,body{
-		// speed: 200
-	    background: #2d2d2d;
-	}
-
- * @return example [/ -> \/]
-	[{
-		type: 'comment',
-		comment: '\/* \n * \n * 彩蛋时间到！\n *\/',
-		options: { delay: '2000' }
-	}, {
-		type: 'common',
-		selector: 'html,body',
-		options: { speed: 200 },
-		style: { background: '#2d2d2d' }
-	}]
- */
 function format$1(source) {
 	var sweetResult = [];
 	source = source || '';
@@ -270,7 +239,7 @@ var Magicss = function () {
 		this.source = this.options.source || '';
 		this.codeCon = this.options.codeCon || false;
 		this._paused = false; // 打印状态
-		this._begin = false; // process
+		this._status = 'nope'; // nope -> start -> processing -> stop -> nope -> ...
 		this._formatedArray = [];
 		this._index = 0;
 		this.format();
@@ -282,31 +251,22 @@ var Magicss = function () {
 			return Object.assign(copyObj(defaultPrintOptions), options);
 		}
 	}, {
-		key: '_handlerComment',
-		value: function _handlerComment(current, cb) {
+		key: '_handler',
+		value: function _handler(current) {
 			var _this = this;
 
-			var options = this._assignPrintOption(current.options);
-			noopPromise().then(function () {
-				return delay(options.delay);
-			}).then(function () {
-				return _this._print(current);
-			}).then(function () {
-				cb();
-			});
-		}
-	}, {
-		key: '_handlerCommon',
-		value: function _handlerCommon(current, cb) {
-			var _this2 = this;
-
-			var options = this._assignPrintOption(current.options);
-			noopPromise().then(function () {
-				return delay(options.delay);
-			}).then(function () {
-				return _this2._print(current);
-			}).then(function () {
-				cb();
+			return new Promise(function (resolve, reject) {
+				if (_this._status === 'nope') {
+					resolve();
+				}
+				var options = _this._assignPrintOption(current.options);
+				noopPromise().then(function () {
+					return delay(options.delay);
+				}).then(function () {
+					return _this._print(current);
+				}).then(function () {
+					resolve();
+				});
 			});
 		}
 
@@ -342,104 +302,102 @@ var Magicss = function () {
 	}, {
 		key: '_print',
 		value: function _print(current, ele) {
-			var _this3 = this;
+			var _this2 = this;
 
 			this._onChange('processing', current);
 			return new Promise(function (resolve, reject) {
 				if (current.type === 'comment') {
-					(function () {
-						var options = _this3._assignPrintOption(current.options);
-						noopPromise().then(function () {
-							var contentArr = split(current.comment, '');
-							var ele = _this3._insertElement('comment');
-							return _this3._writeCharacterArrToEle(ele, contentArr, options.speed);
-						}).then(function () {
-							var contentArr = ['\n'];
-							var ele = _this3.codeCon;
-							return _this3._writeCharacterArrToEle(ele, contentArr, options.speed);
-						}).then(function () {
-							resolve();
-						});
-					})();
+					noopPromise().then(function () {
+						var contentArr = split(current.comment, '');
+						var ele = _this2._insertElement('comment');
+						return _this2._writeCharacterArrToEle(ele, contentArr, current);
+					}).then(function () {
+						var contentArr = ['\n'];
+						var ele = _this2.codeCon;
+						return _this2._writeCharacterArrToEle(ele, contentArr, current);
+					}).then(function () {
+						resolve();
+					});
 				} else if (current.type === 'common') {
-					(function () {
-						var options = _this3._assignPrintOption(current.options);
-						noopPromise().then(function () {
-							var contentArr = split(current.selector, '');
-							var ele = _this3._insertElement('selector');
-							return _this3._writeCharacterArrToEle(ele, contentArr, options.speed);
-						}).then(function () {
-							var contentArr = [' ', '{', '\n'];
-							var ele = _this3.codeCon;
-							return _this3._writeCharacterArrToEle(ele, contentArr, options.speed);
-						}).then(function () {
-							var promises = [];
-							var ruleKeys = Object.keys(current.style);
-							var index = 0;
-							return new Promise(function (resolve, reject) {
-								var iterateRule = function iterateRule() {
-									if (index >= ruleKeys.length) {
-										resolve();
-										return;
-									}
-									var codeCon = _this3.codeCon;
-									_this3._writeCharacterArrToEle(codeCon, [' ', ' ', ' ', ' '], options.speed).then(function () {
-										var contentArr = split(ruleKeys[index], '');
-										var ele = _this3._insertElement('key');
-										return _this3._writeCharacterArrToEle(ele, contentArr, options.speed);
-									}).then(function () {
-										return _this3._writeCharacterArrToEle(codeCon, [':', ' '], options.speed);
-									}).then(function () {
-										var contentArr = split(current.style[ruleKeys[index]], '');
-										var ele = _this3._insertElement('value');
-										return _this3._writeCharacterArrToEle(ele, contentArr, options.speed);
-									}).then(function () {
-										_this3._applyStyle(current.selector, ruleKeys[index], current.style[ruleKeys[index]]);
-										return _this3._writeCharacterArrToEle(codeCon, [';', '\n'], options.speed);
-									}).then(function () {
-										index++;
-										iterateRule();
-									});
-								};
-								iterateRule();
-							});
-						}).then(function () {
-							var contentArr = ['}', '\n\n'];
-							var ele = _this3.codeCon;
-							return _this3._writeCharacterArrToEle(ele, contentArr, options.speed);
-						}).then(function () {
-							resolve();
+					noopPromise().then(function () {
+						var contentArr = split(current.selector, '');
+						var ele = _this2._insertElement('selector');
+						return _this2._writeCharacterArrToEle(ele, contentArr, current);
+					}).then(function () {
+						var contentArr = [' ', '{', '\n'];
+						var ele = _this2.codeCon;
+						return _this2._writeCharacterArrToEle(ele, contentArr, current);
+					}).then(function () {
+						var promises = [];
+						var ruleKeys = Object.keys(current.style);
+						var index = 0;
+						return new Promise(function (resolve, reject) {
+							var iterateRule = function iterateRule() {
+								if (index >= ruleKeys.length) {
+									resolve();
+									return;
+								}
+								var codeCon = _this2.codeCon;
+								_this2._writeCharacterArrToEle(codeCon, [' ', ' ', ' ', ' '], current).then(function () {
+									var contentArr = split(ruleKeys[index], '');
+									var ele = _this2._insertElement('key');
+									return _this2._writeCharacterArrToEle(ele, contentArr, current);
+								}).then(function () {
+									return _this2._writeCharacterArrToEle(codeCon, [':', ' '], current);
+								}).then(function () {
+									var contentArr = split(current.style[ruleKeys[index]], '');
+									var ele = _this2._insertElement('value');
+									return _this2._writeCharacterArrToEle(ele, contentArr, current);
+								}).then(function () {
+									return _this2._writeCharacterArrToEle(codeCon, [';', '\n'], current, index);
+								}).then(function () {
+									index++;
+									iterateRule();
+								});
+							};
+							iterateRule();
 						});
-					})();
+					}).then(function () {
+						var contentArr = ['}', '\n\n'];
+						var ele = _this2.codeCon;
+						return _this2._writeCharacterArrToEle(ele, contentArr, current);
+					}).then(function () {
+						resolve();
+					});
 				}
 			});
 		}
 	}, {
 		key: '_writeCharacterArrToEle',
-		value: function _writeCharacterArrToEle(ele, contentArr, speedMs) {
-			var _this4 = this;
+		value: function _writeCharacterArrToEle(ele, contentArr, current, index) {
+			var _this3 = this;
 
+			var options = this._assignPrintOption(current.options);
 			return new Promise(function (resolve, reject) {
-				var innserLoop = function innserLoop(ele, contentArr, speedMs) {
-					_this4._fixScrollTop();
-					if (!contentArr.length) {
+				var innserLoop = function innserLoop(ele, contentArr, current) {
+					_this3._fixScrollTop();
+					if (!contentArr.length || _this3._status === 'nope') {
 						resolve();
 						return;
 					}
 					var currentHTML = ele.innerHTML;
 					noopPromise().then(function () {
-						return delay(speedMs);
+						return delay(options.speed);
 					}).then(function () {
-						if (!_this4._paused) {
+						if (!_this3._paused) {
+							if (current.type === 'common' && contentArr[0] === ';') {
+								var ruleKeys = Object.keys(current.style);
+								_this3._applyStyle(current.selector, ruleKeys[index], current.style[ruleKeys[index]]);
+							}
 							html(ele, currentHTML += contentArr[0]);
 							contentArr.splice(0, 1);
-							innserLoop(ele, contentArr, speedMs);
+							innserLoop(ele, contentArr, current);
 						} else {
-							innserLoop(ele, contentArr, speedMs);
+							innserLoop(ele, contentArr, current);
 						}
 					});
 				};
-				innserLoop(ele, contentArr, speedMs);
+				innserLoop(ele, contentArr, current);
 			});
 		}
 
@@ -452,7 +410,7 @@ var Magicss = function () {
 			codeCon.scrollTop = codeCon.scrollHeight;
 		}
 
-		// print a new obj or begin or paused or processing or end trigger this func
+		// print a new obj or start or paused or processing or stop trigger this func
 
 	}, {
 		key: '_onChange',
@@ -468,36 +426,31 @@ var Magicss = function () {
 	}, {
 		key: 'init',
 		value: function init() {
-			var _this5 = this;
+			var _this4 = this;
 
 			if (!this.codeCon) {
 				console.warn('You should give a real element to options of "codeCon".');
 				return;
 			}
 
-			if (!this._begin) {
-				this._onChange('begin');
-				this._begin = true;
+			if (this._status === 'nope') {
+				this._status = 'start';
+				this._onChange('start');
 			}
 
 			if (this._index >= this._formatedArray.length) {
-				this._begin = false;
-				this._onChange('end');
+				this._status = 'stop';
+				this._onChange('stop');
+				this.constructor(this.options);
 				return;
 			}
 
 			var _current = this._formatedArray[this._index];
-			if (_current.type === 'comment') {
-				this._handlerComment(_current, function () {
-					_this5._index++;
-					_this5.init();
-				});
-			} else if (_current.type === 'common') {
-				this._handlerCommon(_current, function () {
-					_this5._index++;
-					_this5.init();
-				});
-			}
+			this._status = 'processing';
+			this._handler(_current).then(function () {
+				_this4._index++;
+				_this4.init();
+			});
 		}
 
 		// format css to obj
@@ -505,8 +458,6 @@ var Magicss = function () {
 	}, {
 		key: 'format',
 		value: function format() {
-			// force stop
-			this._index = this._formatedArray.length;
 			this._formatedArray = format$1(this.source);
 			return this._formatedArray;
 		}
@@ -517,7 +468,7 @@ var Magicss = function () {
 		key: 'setOptions',
 		value: function setOptions(options) {
 			this.constructor(options);
-			this.init();
+			// this.init();
 		}
 
 		// pause _print
@@ -551,3 +502,4 @@ var Magicss = function () {
 return Magicss;
 
 })));
+//# sourceMappingURL=magicss.js.map
