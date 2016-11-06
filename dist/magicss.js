@@ -505,6 +505,8 @@ var Magicss = function () {
 	}, {
 		key: 'format',
 		value: function format() {
+			// force stop
+			this._index = this._formatedArray.length;
 			this._formatedArray = format$1(this.source);
 			return this._formatedArray;
 		}

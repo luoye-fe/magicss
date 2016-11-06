@@ -229,6 +229,8 @@ export default class Magicss {
 
 	// format css to obj
 	format() {
+		// force stop
+		this._index = this._formatedArray.length;
 		this._formatedArray = format(this.source);
 		return this._formatedArray;
 	}
