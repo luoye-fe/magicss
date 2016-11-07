@@ -6,8 +6,8 @@
  * @time:2015.01.16
  ************************************************
  */
-var e = {};
-var _each = function(arr, fn) {
+
+function _each(arr, fn) {
 	var ret;
 	for (var i = 0; i < arr.length; i++) {
 		var n = arr[i];
@@ -16,69 +16,71 @@ var _each = function(arr, fn) {
 	return ret;
 }
 
-e.cache = {};
-e.offlineCache = [];
-e.isOne = false;
-e.on = function(key, fn) {
-	var _this = this;
-	if (this.cache[key] === undefined) {
-		this.cache[key] = [];
-		this.cache[key].push(fn);
-	} else {
-		this.cache[key].push(fn);
+class Event {
+	constructor() {
+		this.cache = {};
+		this.offlineCache = [];
+		this.isOne = false;
 	}
-	var _current = [];
-	_each(this.offlineCache, function(index, item) {
-		if (item[key] !== undefined) {
-			var _obj = {};
-			_obj[key] = item[key];
-			_current.push(_obj);
-		}
-	})
-	if (_current.length > 0) {
-		if (_this.isOne) {
-			e.trigger(key, _current[_current.length - 1][key]);
-		} else {
-			_each(_current, function(index, item) {
-				e.trigger(key, item[key]);
-			})
-		}
-	}
-}
-e.one = function(key, fn) {
-	this.isOne = true;
-	this.on(key, fn);
-	this.isOne = false;
-}
-e.off = function(key, fn) {
-	if (this.cache[key]) {
-		if (fn) {
-			fn && fn();
+	on(key, fn) {
+		if (this.cache[key] === undefined) {
 			this.cache[key] = [];
+			this.cache[key].push(fn);
 		} else {
-			this.cache[key] = [];
+			this.cache[key].push(fn);
+		}
+		var _current = [];
+		_each(this.offlineCache, function(index, item) {
+			if (item[key] !== undefined) {
+				var _obj = {};
+				_obj[key] = item[key];
+				_current.push(_obj);
+			}
+		})
+		if (_current.length > 0) {
+			if (this.isOne) {
+				e.trigger(key, _current[_current.length - 1][key]);
+			} else {
+				_each(_current, function(index, item) {
+					e.trigger(key, item[key]);
+				})
+			}
 		}
 	}
-	this.offlineCache = [];
-}
-e.trigger = function(key, value) {
-	var _this = this;
-	var stack = this.cache[key];
-	if (!stack || !stack.length) {
-		var _current = {};
-		_current[key] = value;
-		this.offlineCache.push(_current);
-		return;
-	} else {
-		if (this.isOne) {
-			stack[0].call(_this, value);
-			this.cache[key] = [];
+	one(key, fn) {
+		this.isOne = true;
+		this.on(key, fn);
+		this.isOne = false;
+	}
+	off(key, fn) {
+		if (this.cache[key]) {
+			if (fn) {
+				fn && fn();
+				this.cache[key] = [];
+			} else {
+				this.cache[key] = [];
+			}
+		}
+		this.offlineCache = [];
+	}
+	trigger(key, value) {
+		var stack = this.cache[key];
+		if (!stack || !stack.length) {
+			var _current = {};
+			_current[key] = value;
+			this.offlineCache.push(_current);
+			return;
 		} else {
-			return _each(stack, function() {
-				return this.call(_this, value);
-			})
+			if (this.isOne) {
+				stack[0].call(this, value);
+				this.cache[key] = [];
+			} else {
+				return _each(stack, function() {
+					return this.call(this, value);
+				})
+			}
 		}
 	}
 }
 
-export default e;
+export default Event;

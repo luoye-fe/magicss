@@ -203,6 +203,10 @@ function format$1(source) {
 	return sweetResult;
 }
 
+var _createClass$1 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck$1(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 /* eslint-disable */
 /*
  ************************************************
@@ -211,80 +215,96 @@ function format$1(source) {
  * @time:2015.01.16
  ************************************************
  */
-var e = {};
-var _each = function _each(arr, fn) {
+
+function _each(arr, fn) {
 	var ret;
 	for (var i = 0; i < arr.length; i++) {
 		var n = arr[i];
 		ret = fn.call(n, i, n);
 	}
 	return ret;
-};
+}
 
-e.cache = {};
-e.offlineCache = [];
-e.isOne = false;
-e.on = function (key, fn) {
-	var _this = this;
-	if (this.cache[key] === undefined) {
-		this.cache[key] = [];
-		this.cache[key].push(fn);
-	} else {
-		this.cache[key].push(fn);
+var Event = function () {
+	function Event() {
+		_classCallCheck$1(this, Event);
+
+		this.cache = {};
+		this.offlineCache = [];
+		this.isOne = false;
 	}
-	var _current = [];
-	_each(this.offlineCache, function (index, item) {
-		if (item[key] !== undefined) {
-			var _obj = {};
-			_obj[key] = item[key];
-			_current.push(_obj);
-		}
-	});
-	if (_current.length > 0) {
-		if (_this.isOne) {
-			e.trigger(key, _current[_current.length - 1][key]);
-		} else {
-			_each(_current, function (index, item) {
-				e.trigger(key, item[key]);
+
+	_createClass$1(Event, [{
+		key: "on",
+		value: function on(key, fn) {
+			if (this.cache[key] === undefined) {
+				this.cache[key] = [];
+				this.cache[key].push(fn);
+			} else {
+				this.cache[key].push(fn);
+			}
+			var _current = [];
+			_each(this.offlineCache, function (index, item) {
+				if (item[key] !== undefined) {
+					var _obj = {};
+					_obj[key] = item[key];
+					_current.push(_obj);
+				}
 			});
+			if (_current.length > 0) {
+				if (this.isOne) {
+					e.trigger(key, _current[_current.length - 1][key]);
+				} else {
+					_each(_current, function (index, item) {
+						e.trigger(key, item[key]);
+					});
+				}
+			}
 		}
-	}
-};
-e.one = function (key, fn) {
-	this.isOne = true;
-	this.on(key, fn);
-	this.isOne = false;
-};
-e.off = function (key, fn) {
-	if (this.cache[key]) {
-		if (fn) {
-			fn && fn();
-			this.cache[key] = [];
-		} else {
-			this.cache[key] = [];
+	}, {
+		key: "one",
+		value: function one(key, fn) {
+			this.isOne = true;
+			this.on(key, fn);
+			this.isOne = false;
 		}
-	}
-	this.offlineCache = [];
-};
-e.trigger = function (key, value) {
-	var _this = this;
-	var stack = this.cache[key];
-	if (!stack || !stack.length) {
-		var _current = {};
-		_current[key] = value;
-		this.offlineCache.push(_current);
-		return;
-	} else {
-		if (this.isOne) {
-			stack[0].call(_this, value);
-			this.cache[key] = [];
-		} else {
-			return _each(stack, function () {
-				return this.call(_this, value);
-			});
+	}, {
+		key: "off",
+		value: function off(key, fn) {
+			if (this.cache[key]) {
+				if (fn) {
+					fn && fn();
+					this.cache[key] = [];
+				} else {
+					this.cache[key] = [];
+				}
+			}
+			this.offlineCache = [];
 		}
-	}
-};
+	}, {
+		key: "trigger",
+		value: function trigger(key, value) {
+			var stack = this.cache[key];
+			if (!stack || !stack.length) {
+				var _current = {};
+				_current[key] = value;
+				this.offlineCache.push(_current);
+				return;
+			} else {
+				if (this.isOne) {
+					stack[0].call(this, value);
+					this.cache[key] = [];
+				} else {
+					return _each(stack, function () {
+						return this.call(this, value);
+					});
+				}
+			}
+		}
+	}]);
+
+	return Event;
+}();
 
 function $(selector) {
 	return document.querySelector(selector);
@@ -344,6 +364,8 @@ var defaultPrintOptions = {
 	speed: 50, // ms/每字符
 	delay: 0
 };
+
+var event = new Event();
 
 var Magicss = function () {
 	function Magicss(options) {
@@ -565,15 +587,17 @@ var Magicss = function () {
 
 			if (this._status === 'nope') {
 				this._index = 0;
-				e.trigger('nope');
+				event.trigger('nope');
 				return;
 			}
 
 			if (this._index >= this._formatedArray.length) {
 				this._status = 'stop';
 				this._onChange('stop');
+				this._status = 'nope';
 				return;
 			}
+
 			var _current = this._formatedArray[this._index];
 			this._status = 'processing';
 			this._handler(_current).then(function () {
@@ -603,9 +627,16 @@ var Magicss = function () {
 		value: function setOptions(options) {
 			var _this5 = this;
 
+			// first init
+			if (this._status === 'nope') {
+				this.constructor(options);
+				this.init();
+				return;
+			}
+			// midway init
 			this.constructor(options);
-			e.on('nope', function () {
-				_this5._init();
+			event.on('nope', function () {
+				_this5.init();
 			});
 		}
 

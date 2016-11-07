@@ -10,6 +10,8 @@ const defaultPrintOptions = {
 	delay: 0
 };
 
+const event = new Event();
+
 export default class Magicss {
 	constructor(options) {
 		this.options = options || {};
@@ -211,15 +213,17 @@ export default class Magicss {
 
 		if (this._status === 'nope') {
 			this._index = 0;
-			Event.trigger('nope');
+			event.trigger('nope');
 			return;
 		}
 
 		if (this._index >= this._formatedArray.length) {
 			this._status = 'stop';
 			this._onChange('stop');
+			this._status = 'nope';
 			return;
 		}
+
 		const _current = this._formatedArray[this._index];
 		this._status = 'processing';
 		this._handler(_current)
@@ -241,9 +245,16 @@ export default class Magicss {
 
 	// change source text
 	setOptions(options) {
+		// first init
+		if (this._status === 'nope') {
+			this.constructor(options);
+			this.init();
+			return;
+		}
+		// midway init
 		this.constructor(options);
-		Event.on('nope', () => {
-			this._init();
+		event.on('nope', () => {
+			this.init();
 		});
 	}
 

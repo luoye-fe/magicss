@@ -15,7 +15,9 @@ html, body {
 /* global Magicss */
 `;
 
-var baymax = new Magicss({
+var baymax = new Magicss();
+
+baymax.setOptions({
 	source: sourceText,
 	codeCon: document.getElementById('work_con'),
 	onChange: function(process, argvs) {
@@ -24,4 +26,4 @@ var baymax = new Magicss({
 	}
 });
 
-baymax.init();
+// baymax.init();
