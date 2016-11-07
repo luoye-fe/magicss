@@ -1,3 +1,7 @@
+/*
+ * Magicss v1.0.0
+ * (c) 2016 luoye <842891024@qq.com>
+ */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
@@ -37,6 +41,33 @@ var objType = function objType(obj) {
 	return Object.prototype.toString.call(obj).match(/\[object\s(.+?)]/)[1];
 };
 
+/**
+ * [format css to Array]
+ * @description 格式化 css 文本，支持注释参数或者规则参数
+ * @param  {[String]} source [css source text]
+ * @return {[Array]}        [array]
+ * @css example
+	\/*
+	 * {{delay:2000}}
+	 * 彩蛋时间到！
+	 *\/
+	html,body{
+		// speed: 200
+	    background: #2d2d2d;
+	}
+
+ * @return example [/ -> \/]
+	[{
+		type: 'comment',
+		comment: '\/* \n * \n * 彩蛋时间到！\n *\/',
+		options: { delay: '2000' }
+	}, {
+		type: 'common',
+		selector: 'html,body',
+		options: { speed: 200 },
+		style: { background: '#2d2d2d' }
+	}]
+ */
 function format$1(source) {
 	var sweetResult = [];
 	source = source || '';
@@ -172,6 +203,89 @@ function format$1(source) {
 	return sweetResult;
 }
 
+/* eslint-disable */
+/*
+ ************************************************
+ * @author:luoye https://github.com/luoye-fe
+ * @desc:event on/trigger/one/off
+ * @time:2015.01.16
+ ************************************************
+ */
+var e = {};
+var _each = function _each(arr, fn) {
+	var ret;
+	for (var i = 0; i < arr.length; i++) {
+		var n = arr[i];
+		ret = fn.call(n, i, n);
+	}
+	return ret;
+};
+
+e.cache = {};
+e.offlineCache = [];
+e.isOne = false;
+e.on = function (key, fn) {
+	var _this = this;
+	if (this.cache[key] === undefined) {
+		this.cache[key] = [];
+		this.cache[key].push(fn);
+	} else {
+		this.cache[key].push(fn);
+	}
+	var _current = [];
+	_each(this.offlineCache, function (index, item) {
+		if (item[key] !== undefined) {
+			var _obj = {};
+			_obj[key] = item[key];
+			_current.push(_obj);
+		}
+	});
+	if (_current.length > 0) {
+		if (_this.isOne) {
+			e.trigger(key, _current[_current.length - 1][key]);
+		} else {
+			_each(_current, function (index, item) {
+				e.trigger(key, item[key]);
+			});
+		}
+	}
+};
+e.one = function (key, fn) {
+	this.isOne = true;
+	this.on(key, fn);
+	this.isOne = false;
+};
+e.off = function (key, fn) {
+	if (this.cache[key]) {
+		if (fn) {
+			fn && fn();
+			this.cache[key] = [];
+		} else {
+			this.cache[key] = [];
+		}
+	}
+	this.offlineCache = [];
+};
+e.trigger = function (key, value) {
+	var _this = this;
+	var stack = this.cache[key];
+	if (!stack || !stack.length) {
+		var _current = {};
+		_current[key] = value;
+		this.offlineCache.push(_current);
+		return;
+	} else {
+		if (this.isOne) {
+			stack[0].call(_this, value);
+			this.cache[key] = [];
+		} else {
+			return _each(stack, function () {
+				return this.call(_this, value);
+			});
+		}
+	}
+};
+
 function $(selector) {
 	return document.querySelector(selector);
 }
@@ -306,98 +420,109 @@ var Magicss = function () {
 
 			this._onChange('processing', current);
 			return new Promise(function (resolve, reject) {
+				if (_this2._status === 'nope') {
+					resolve();
+				}
 				if (current.type === 'comment') {
-					noopPromise().then(function () {
-						var contentArr = split(current.comment, '');
-						var ele = _this2._insertElement('comment');
-						return _this2._writeCharacterArrToEle(ele, contentArr, current);
-					}).then(function () {
-						var contentArr = ['\n'];
-						var ele = _this2.codeCon;
-						return _this2._writeCharacterArrToEle(ele, contentArr, current);
-					}).then(function () {
-						resolve();
-					});
-				} else if (current.type === 'common') {
-					noopPromise().then(function () {
-						var contentArr = split(current.selector, '');
-						var ele = _this2._insertElement('selector');
-						return _this2._writeCharacterArrToEle(ele, contentArr, current);
-					}).then(function () {
-						var contentArr = [' ', '{', '\n'];
-						var ele = _this2.codeCon;
-						return _this2._writeCharacterArrToEle(ele, contentArr, current);
-					}).then(function () {
-						var promises = [];
-						var ruleKeys = Object.keys(current.style);
-						var index = 0;
-						return new Promise(function (resolve, reject) {
-							var iterateRule = function iterateRule() {
-								if (index >= ruleKeys.length) {
-									resolve();
-									return;
-								}
-								var codeCon = _this2.codeCon;
-								_this2._writeCharacterArrToEle(codeCon, [' ', ' ', ' ', ' '], current).then(function () {
-									var contentArr = split(ruleKeys[index], '');
-									var ele = _this2._insertElement('key');
-									return _this2._writeCharacterArrToEle(ele, contentArr, current);
-								}).then(function () {
-									return _this2._writeCharacterArrToEle(codeCon, [':', ' '], current);
-								}).then(function () {
-									var contentArr = split(current.style[ruleKeys[index]], '');
-									var ele = _this2._insertElement('value');
-									return _this2._writeCharacterArrToEle(ele, contentArr, current);
-								}).then(function () {
-									return _this2._writeCharacterArrToEle(codeCon, [';', '\n'], current, index);
-								}).then(function () {
-									index++;
-									iterateRule();
-								});
-							};
-							iterateRule();
+					(function () {
+						var options = _this2._assignPrintOption(current.options);
+						noopPromise().then(function () {
+							var contentArr = split(current.comment, '');
+							var ele = _this2._insertElement('comment');
+							return _this2._writeCharacterArrToEle(ele, contentArr, options.speed);
+						}).then(function () {
+							var contentArr = ['\n'];
+							var ele = _this2.codeCon;
+							return _this2._writeCharacterArrToEle(ele, contentArr, options.speed);
+						}).then(function () {
+							resolve();
 						});
-					}).then(function () {
-						var contentArr = ['}', '\n\n'];
-						var ele = _this2.codeCon;
-						return _this2._writeCharacterArrToEle(ele, contentArr, current);
-					}).then(function () {
-						resolve();
-					});
+					})();
+				} else if (current.type === 'common') {
+					(function () {
+						var options = _this2._assignPrintOption(current.options);
+						noopPromise().then(function () {
+							var contentArr = split(current.selector, '');
+							var ele = _this2._insertElement('selector');
+							return _this2._writeCharacterArrToEle(ele, contentArr, options.speed);
+						}).then(function () {
+							var contentArr = [' ', '{', '\n'];
+							var ele = _this2.codeCon;
+							return _this2._writeCharacterArrToEle(ele, contentArr, options.speed);
+						}).then(function () {
+							var promises = [];
+							var ruleKeys = Object.keys(current.style);
+							var index = 0;
+							return new Promise(function (resolve, reject) {
+								var iterateRule = function iterateRule() {
+									if (index >= ruleKeys.length || _this2._status === 'nope') {
+										resolve();
+										return;
+									}
+									var codeCon = _this2.codeCon;
+									_this2._writeCharacterArrToEle(codeCon, [' ', ' ', ' ', ' '], options.speed).then(function () {
+										var contentArr = split(ruleKeys[index], '');
+										var ele = _this2._insertElement('key');
+										return _this2._writeCharacterArrToEle(ele, contentArr, options.speed);
+									}).then(function () {
+										return _this2._writeCharacterArrToEle(codeCon, [':', ' '], options.speed);
+									}).then(function () {
+										var contentArr = split(current.style[ruleKeys[index]], '');
+										var ele = _this2._insertElement('value');
+										return _this2._writeCharacterArrToEle(ele, contentArr, options.speed);
+									}).then(function () {
+										var ruleKey = ruleKeys[index];
+										var ruleValue = current.style[ruleKeys[index]];
+										return _this2._writeCharacterArrToEle(codeCon, [';', '\n'], options.speed, current.selector, ruleKey, ruleValue);
+									}).then(function () {
+										index++;
+										iterateRule();
+									});
+								};
+								iterateRule();
+							});
+						}).then(function () {
+							var contentArr = ['}', '\n\n'];
+							var ele = _this2.codeCon;
+							return _this2._writeCharacterArrToEle(ele, contentArr, options.speed);
+						}).then(function () {
+							resolve();
+						});
+					})();
 				}
 			});
 		}
 	}, {
 		key: '_writeCharacterArrToEle',
-		value: function _writeCharacterArrToEle(ele, contentArr, current, index) {
+		value: function _writeCharacterArrToEle(ele, contentArr, speedMs, selector, ruleKey, ruleValue) {
 			var _this3 = this;
 
-			var options = this._assignPrintOption(current.options);
 			return new Promise(function (resolve, reject) {
-				var innserLoop = function innserLoop(ele, contentArr, current) {
-					_this3._fixScrollTop();
+				var iterateWrite = function iterateWrite(ele, contentArr, speedMs) {
 					if (!contentArr.length || _this3._status === 'nope') {
 						resolve();
 						return;
 					}
 					var currentHTML = ele.innerHTML;
 					noopPromise().then(function () {
-						return delay(options.speed);
+						return delay(speedMs);
 					}).then(function () {
 						if (!_this3._paused) {
-							if (current.type === 'common' && contentArr[0] === ';') {
-								var ruleKeys = Object.keys(current.style);
-								_this3._applyStyle(current.selector, ruleKeys[index], current.style[ruleKeys[index]]);
+							if (contentArr[0] === '\n') {
+								_this3._fixScrollTop();
+							}
+							if (selector && contentArr[0] === ';') {
+								_this3._applyStyle(selector, ruleKey, ruleValue);
 							}
 							html(ele, currentHTML += contentArr[0]);
 							contentArr.splice(0, 1);
-							innserLoop(ele, contentArr, current);
+							iterateWrite(ele, contentArr, speedMs);
 						} else {
-							innserLoop(ele, contentArr, current);
+							iterateWrite(ele, contentArr, speedMs);
 						}
 					});
 				};
-				innserLoop(ele, contentArr, current);
+				iterateWrite(ele, contentArr, speedMs);
 			});
 		}
 
@@ -424,8 +549,8 @@ var Magicss = function () {
 		// init
 
 	}, {
-		key: 'init',
-		value: function init() {
+		key: '_init',
+		value: function _init() {
 			var _this4 = this;
 
 			if (!this.codeCon) {
@@ -433,24 +558,33 @@ var Magicss = function () {
 				return;
 			}
 
-			if (this._status === 'nope') {
+			if (this._index === 0) {
 				this._status = 'start';
 				this._onChange('start');
+			}
+
+			if (this._status === 'nope') {
+				this._index = 0;
+				e.trigger('nope');
+				return;
 			}
 
 			if (this._index >= this._formatedArray.length) {
 				this._status = 'stop';
 				this._onChange('stop');
-				this.constructor(this.options);
 				return;
 			}
-
 			var _current = this._formatedArray[this._index];
 			this._status = 'processing';
 			this._handler(_current).then(function () {
 				_this4._index++;
-				_this4.init();
+				_this4._init();
 			});
+		}
+	}, {
+		key: 'init',
+		value: function init() {
+			this._init();
 		}
 
 		// format css to obj
@@ -467,8 +601,12 @@ var Magicss = function () {
 	}, {
 		key: 'setOptions',
 		value: function setOptions(options) {
+			var _this5 = this;
+
 			this.constructor(options);
-			// this.init();
+			e.on('nope', function () {
+				_this5._init();
+			});
 		}
 
 		// pause _print
@@ -502,4 +640,3 @@ var Magicss = function () {
 return Magicss;
 
 })));
-//# sourceMappingURL=magicss.js.map
