@@ -252,8 +252,9 @@ export default class Magicss {
 			return;
 		}
 		// midway init
-		this.constructor(options);
+		this._status === 'nope';
 		event.on('nope', () => {
+			this.constructor(options);
 			this.init();
 		});
 	}

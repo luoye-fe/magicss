@@ -23,7 +23,7 @@ class Event {
 		this.isOne = false;
 	}
 	on(key, fn) {
-		if (this.cache[key] === undefined) {
+		if (!this.cache[key]) {
 			this.cache[key] = [];
 			this.cache[key].push(fn);
 		} else {
@@ -39,10 +39,10 @@ class Event {
 		})
 		if (_current.length > 0) {
 			if (this.isOne) {
-				e.trigger(key, _current[_current.length - 1][key]);
+				this.trigger(key, _current[_current.length - 1][key]);
 			} else {
 				_each(_current, function(index, item) {
-					e.trigger(key, item[key]);
+					this.trigger(key, item[key]);
 				})
 			}
 		}
