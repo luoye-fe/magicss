@@ -596,8 +596,8 @@ var Magicss = function () {
 
 			if (this._index >= this._formatedArray.length) {
 				this._status = 'stop';
-				this._onChange('stop');
 				this._block = false;
+				this._onChange('stop');
 				this._status = 'nope';
 				return;
 			}
@@ -669,6 +669,7 @@ var Magicss = function () {
 			var _this5 = this;
 
 			return new Promise(function (resolve, reject) {
+				console.log(_this5._block);
 				if (!_this5._block) {
 					if (objType(cb) === 'Function') {
 						cb();
