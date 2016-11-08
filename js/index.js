@@ -14,10 +14,13 @@ var workCon = $('#work-con');
 
 function biu() {
 	var val = editor.getValue();
-	magicss.setOptions({
-		source: val,
-		codeCon: workCon
-	});
+	magicss.stop()
+		.then(() => {
+			magicss.setOptions({
+				source: val,
+				codeCon: workCon
+			});
+		})
 	editor.setValue('');
 }
 
@@ -28,25 +31,30 @@ window.addEventListener('keydown', function(e) {
 });
 
 function init() {
-	magicss.setOptions({
-		source: 
-`
+	magicss.stop()
+		.then(() => {
+			magicss.setOptions({
+				source: `
 * {
 	transition: all ease 0.8s;
 }
-`,
-		codeCon: workCon,
-		onChange: function(process, argvs) {
-			if (process === 'end') {
-				applyCodeStyle();
-			}
-		}
-	})
+			`,
+				codeCon: workCon,
+				onChange: function(process, argvs) {
+					console.log(process);
+					if (process === 'stop') {
+						applyCodeStyle();
+					}
+				}
+			})
+		})
 }
 
 function applyCodeStyle() {
-	magicss.setOptions({
-		source: `
+	magicss.stop()
+		.then(() => {
+			magicss.setOptions({
+				source: `
 /* {{delay: 2000}}
  * 让我们来修饰下代码
  */
@@ -86,19 +94,20 @@ function applyCodeStyle() {
 	/* speed: 20 */
     color: #62cbcc;
 }
-		`,
-		codeCon: workCon,
-		onChange: function(process, argvs) {
-			if (process === 'end') {
+					`,
+				codeCon: workCon,
+				onChange: function(process, argvs) {
+					if (process === 'stop') {
 
-			}
-		}
-	});
+					}
+				}
+			});
+		})
 }
 
 
 // function 
 
-// init();
+init();
 // applyCodeStyle();
 // changeBodybg();
