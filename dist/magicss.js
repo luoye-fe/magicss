@@ -596,8 +596,8 @@ var Magicss = function () {
 
 			if (this._index >= this._formatedArray.length) {
 				this._status = 'stop';
-				this._onChange('stop');
 				this._block = false;
+				this._onChange('stop');
 				this._status = 'nope';
 				return;
 			}
