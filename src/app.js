@@ -17,8 +17,9 @@ export default class Magicss {
 		this.options = options || {};
 		this.source = this.options.source || '';
 		this.codeCon = this.options.codeCon || false;
-		this._paused = false; // 打印状态
+		this._paused = false; // 暂停与否
 		this._status = 'nope'; // nope -> start -> processing -> stop -> nope -> ...
+		this._block = false;
 		this._formatedArray = [];
 		this._index = 0;
 		this.format();
@@ -208,11 +209,13 @@ export default class Magicss {
 
 		if (this._index === 0) {
 			this._status = 'start';
+			this._block = true;
 			this._onChange('start');
 		}
 
 		if (this._status === 'nope') {
 			this._index = 0;
+			this._block = false;
 			event.trigger('nope');
 			return;
 		}
@@ -220,6 +223,7 @@ export default class Magicss {
 		if (this._index >= this._formatedArray.length) {
 			this._status = 'stop';
 			this._onChange('stop');
+			this._block = false;
 			this._status = 'nope';
 			return;
 		}
@@ -245,18 +249,12 @@ export default class Magicss {
 
 	// change source text
 	setOptions(options) {
-		// first init
-		if (this._status === 'nope') {
-			this.constructor(options);
-			this.init();
+		if (this._block) {
+			console.warn('Print process is running. Please wait it stop or apply stop func.');
 			return;
 		}
-		// midway init
-		this._status === 'nope';
-		event.on('nope', () => {
-			this.constructor(options);
-			this.init();
-		});
+		this.constructor(options);
+		this.init();
 	}
 
 	// pause _print
@@ -272,5 +270,25 @@ export default class Magicss {
 	// toggle _print
 	toggle() {
 		this._paused = !this._paused;
+	}
+
+	// stop hook
+	stop(cb) {
+		return new Promise((resolve, reject) => {
+			if (!this._block) {
+				if (objType(cb) === 'Function') {
+					cb();
+				}
+				resolve();
+			}
+			this._status = 'nope';
+			event.on('nope', () => {
+				if (objType(cb) === 'Function') {
+					cb();
+				}
+				event.off('nope');
+				resolve();
+			});
+		});
 	}
 };

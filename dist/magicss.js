@@ -1,7 +1,3 @@
-/*
- * Magicss v1.0.0
- * (c) 2016 luoye <842891024@qq.com>
- */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
@@ -41,33 +37,6 @@ var objType = function objType(obj) {
 	return Object.prototype.toString.call(obj).match(/\[object\s(.+?)]/)[1];
 };
 
-/**
- * [format css to Array]
- * @description 格式化 css 文本，支持注释参数或者规则参数
- * @param  {[String]} source [css source text]
- * @return {[Array]}        [array]
- * @css example
-	\/*
-	 * {{delay:2000}}
-	 * 彩蛋时间到！
-	 *\/
-	html,body{
-		// speed: 200
-	    background: #2d2d2d;
-	}
-
- * @return example [/ -> \/]
-	[{
-		type: 'comment',
-		comment: '\/* \n * \n * 彩蛋时间到！\n *\/',
-		options: { delay: '2000' }
-	}, {
-		type: 'common',
-		selector: 'html,body',
-		options: { speed: 200 },
-		style: { background: '#2d2d2d' }
-	}]
- */
 function format$1(source) {
 	var sweetResult = [];
 	source = source || '';
@@ -237,7 +206,7 @@ var Event = function () {
 	_createClass$1(Event, [{
 		key: "on",
 		value: function on(key, fn) {
-			if (this.cache[key] === undefined) {
+			if (!this.cache[key]) {
 				this.cache[key] = [];
 				this.cache[key].push(fn);
 			} else {
@@ -253,10 +222,10 @@ var Event = function () {
 			});
 			if (_current.length > 0) {
 				if (this.isOne) {
-					e.trigger(key, _current[_current.length - 1][key]);
+					this.trigger(key, _current[_current.length - 1][key]);
 				} else {
 					_each(_current, function (index, item) {
-						e.trigger(key, item[key]);
+						this.trigger(key, item[key]);
 					});
 				}
 			}
@@ -374,8 +343,9 @@ var Magicss = function () {
 		this.options = options || {};
 		this.source = this.options.source || '';
 		this.codeCon = this.options.codeCon || false;
-		this._paused = false; // 打印状态
+		this._paused = false; // 暂停与否
 		this._status = 'nope'; // nope -> start -> processing -> stop -> nope -> ...
+		this._block = false;
 		this._formatedArray = [];
 		this._index = 0;
 		this.format();
@@ -582,11 +552,13 @@ var Magicss = function () {
 
 			if (this._index === 0) {
 				this._status = 'start';
+				this._block = true;
 				this._onChange('start');
 			}
 
 			if (this._status === 'nope') {
 				this._index = 0;
+				this._block = false;
 				event.trigger('nope');
 				return;
 			}
@@ -594,6 +566,7 @@ var Magicss = function () {
 			if (this._index >= this._formatedArray.length) {
 				this._status = 'stop';
 				this._onChange('stop');
+				this._block = false;
 				this._status = 'nope';
 				return;
 			}
@@ -625,19 +598,12 @@ var Magicss = function () {
 	}, {
 		key: 'setOptions',
 		value: function setOptions(options) {
-			var _this5 = this;
-
-			// first init
-			if (this._status === 'nope') {
-				this.constructor(options);
-				this.init();
+			if (this._block) {
+				console.warn('Print process is running. Please wait it stop or apply stop func.');
 				return;
 			}
-			// midway init
 			this.constructor(options);
-			event.on('nope', function () {
-				_this5.init();
-			});
+			this.init();
 		}
 
 		// pause _print
@@ -663,6 +629,31 @@ var Magicss = function () {
 		value: function toggle() {
 			this._paused = !this._paused;
 		}
+
+		// stop hook
+
+	}, {
+		key: 'stop',
+		value: function stop(cb) {
+			var _this5 = this;
+
+			return new Promise(function (resolve, reject) {
+				if (!_this5._block) {
+					if (objType(cb) === 'Function') {
+						cb();
+					}
+					resolve();
+				}
+				_this5._status = 'nope';
+				event.on('nope', function () {
+					if (objType(cb) === 'Function') {
+						cb();
+					}
+					event.off('nope');
+					resolve();
+				});
+			});
+		}
 	}]);
 
 	return Magicss;
@@ -671,3 +662,4 @@ var Magicss = function () {
 return Magicss;
 
 })));
+//# sourceMappingURL=magicss.js.map
