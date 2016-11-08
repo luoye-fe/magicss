@@ -24,6 +24,10 @@ function biu() {
 	editor.setValue('');
 }
 
+function toggle() {
+	magicss.toggle();
+}
+
 window.addEventListener('keydown', function(e) {
 	if (e.metaKey && e.keyCode === 13 && editor.hasFocus()) {
 		biu();
@@ -72,14 +76,14 @@ const content = [`
 }`, `
 #work-con {
 	/* speed: 20 */
-    position: fixed;
-    width: 49%;
-    height: 98%;
-    top: 1%;
-    left: 1%;
-    border: 1px solid #333;
-    background-color: #282c34;
-    color: #fff;
+	position: fixed;
+	width: 40%;
+	height: 94%;
+	top: 3%;
+	left: 1%;
+	border: 1px solid #333;
+	background-color: #282c34;
+	color: #fff;
 }
 #work-con .comment {
 	/* speed: 20 */
@@ -96,12 +100,18 @@ const content = [`
 #work-con .value {
 	/* speed: 20 */
     color: #62cbcc;
-}`];
+}`, `
+#work-con {
+	/* speed: 20 */
+	perspective-origin: 50% 50%;
+	transform: perspective(3600px) rotateY(740deg);
+}
+`];
 
 let index = 0;
 
 // dev
-// index = 2;
+// index = 5;
 // content.length = index + 1;
 
 function init() {

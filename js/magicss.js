@@ -535,9 +535,7 @@ var Magicss = function () {
 								_this3._applyStyle(selector, ruleKey, ruleValue);
 							}
 							html(ele, currentHTML += contentArr[0]);
-							// if (contentArr[0] === '\n') {
-								_this3._fixScrollTop();
-							// }
+							_this3._fixScrollTop();
 							contentArr.splice(0, 1);
 							iterateWrite(ele, contentArr, speedMs);
 						} else {
