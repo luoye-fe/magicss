@@ -1,5 +1,6 @@
 .code-input-con {
 	position: fixed;
+	display: none;
 	width: 500px;
 	height: 300px;
 	right: 5px;
@@ -27,3 +28,12 @@
 	box-shadow: none;
 	outline: none;
 }
+
+#work-con {
+	overflow: auto;
+    white-space: pre-wrap;
+    padding: 10px 15px;
+    box-sizing: border-box;
+    line-height: 16px;
+}
+

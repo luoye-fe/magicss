@@ -531,13 +531,13 @@ var Magicss = function () {
 						return delay(speedMs);
 					}).then(function () {
 						if (!_this3._paused) {
-							if (contentArr[0] === '\n') {
-								_this3._fixScrollTop();
-							}
 							if (selector && contentArr[0] === ';') {
 								_this3._applyStyle(selector, ruleKey, ruleValue);
 							}
 							html(ele, currentHTML += contentArr[0]);
+							// if (contentArr[0] === '\n') {
+								_this3._fixScrollTop();
+							// }
 							contentArr.splice(0, 1);
 							iterateWrite(ele, contentArr, speedMs);
 						} else {
@@ -669,7 +669,6 @@ var Magicss = function () {
 			var _this5 = this;
 
 			return new Promise(function (resolve, reject) {
-				console.log(_this5._block);
 				if (!_this5._block) {
 					if (objType(cb) === 'Function') {
 						cb();

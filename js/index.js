@@ -30,57 +30,59 @@ window.addEventListener('keydown', function(e) {
 	}
 });
 
-function init() {
-	magicss.stop()
-		.then(() => {
-			magicss.setOptions({
-				source: `
+const content = [`
+/* 
+ * Hello World!
+ */
+
+`,`
+
+/* {{delay: 1000}}
+ * Magicss, apply your css rules real-time while printing them on the screen.
+ * Now, show it.
+ */
+
+`,`
+
+/* {{speed:15}}
+ *  ┏┓　　　┏┓
+ *┏┛┻━━━┛┻┓
+ *┃　　　　　　　┃ 　
+ *┃　　　━　　　┃
+ *┃　┳┛　┗┳　┃
+ *┃　　　　　　　┃
+ *┃　　　┻　　　┃
+ *┃　　　　　　　┃
+ *┗━┓　　　┏━┛
+ *　　┃　　　┃ 神兽保佑
+ *　　┃　　　┃ 代码无BUG！
+ *　　┃　　　┗━━━┓
+ *　　┃　　　　　　　┣┓
+ *　　┃　　　　　　　┏┛
+ *　　┗┓┓┏━┳┓┏┛
+ *　　　┃┫┫　┃┫┫
+ *　　　┗┻┛　┗┻┛ 
+ *　　　
+ */
+ 
+`,`
 * {
 	transition: all ease 0.8s;
-}
-			`,
-				codeCon: workCon,
-				onChange: function(process, argvs) {
-					console.log(process);
-					if (process === 'stop') {
-						applyCodeStyle();
-					}
-				}
-			})
-		})
-}
-
-function applyCodeStyle() {
-	magicss.stop()
-		.then(() => {
-			magicss.setOptions({
-				source: `
-/* {{delay: 2000}}
- * 让我们来修饰下代码
- */
+}`, `
 #work-con {
-	/* delay: 2000;speed: 20 */
+	/* speed: 20 */
     position: fixed;
-    overflow: auto;
-    right: 5px;
-    top: 5px;
-    width: 500px;
-    height: 300px;
-    margin: 0;
-    white-space: pre-wrap;
-    outline: 0;
-    border: 1px solid #ccc;
-    padding: 10px 15px;
-    box-sizing: border-box;
-    font-size: 12px;
-    line-height: 16px;
+    width: 49%;
+    height: 98%;
+    top: 1%;
+    left: 1%;
+    border: 1px solid #333;
+    background-color: #282c34;
     color: #fff;
-    background: #2d2d2d;
 }
 #work-con .comment {
 	/* speed: 20 */
     color: #747269;
-    font-style: italic;
 }
 #work-con .selector {
 	/* speed: 20 */
@@ -93,21 +95,31 @@ function applyCodeStyle() {
 #work-con .value {
 	/* speed: 20 */
     color: #62cbcc;
-}
-					`,
+}`];
+
+let index = 0;
+
+// dev
+// index = 2;
+// content.length = index + 1;
+
+function init() {
+	if (index >= content.length) {
+		return;
+	}
+	magicss.stop()
+		.then(() => {
+			magicss.setOptions({
+				source: content[index],
 				codeCon: workCon,
 				onChange: function(process, argvs) {
 					if (process === 'stop') {
-
+						index++;
+						init();
 					}
 				}
-			});
+			})
 		})
 }
 
-
-// function 
-
 init();
-// applyCodeStyle();
-// changeBodybg();
