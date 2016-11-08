@@ -168,13 +168,11 @@ export default class Magicss {
 					})
 					.then(() => {
 						if (!this._paused) {
-							if (contentArr[0] === '\n') {
-								this._fixScrollTop();
-							}
 							if (selector && contentArr[0] === ';') {
 								this._applyStyle(selector, ruleKey, ruleValue);
 							}
 							html(ele, currentHTML += contentArr[0]);
+							this._fixScrollTop();
 							contentArr.splice(0, 1);
 							iterateWrite(ele, contentArr, speedMs);
 						} else {
