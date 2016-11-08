@@ -39,12 +39,13 @@ const content = [`
 
 /* {{delay: 1000}}
  * Magicss, apply your css rules real-time while printing them on the screen.
+ *
  * Now, show it.
  */
 
 `,`
 
-/* {{speed:15}}
+/* {{delay: 1000; speed:15;}}
  *  ┏┓　　　┏┓
  *┏┛┻━━━┛┻┓
  *┃　　　　　　　┃ 　
