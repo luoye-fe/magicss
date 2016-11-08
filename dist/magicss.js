@@ -1,3 +1,7 @@
+/*
+ * Magicss v1.0.0
+ * (c) 2016 luoye <842891024@qq.com>
+ */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
@@ -37,6 +41,33 @@ var objType = function objType(obj) {
 	return Object.prototype.toString.call(obj).match(/\[object\s(.+?)]/)[1];
 };
 
+/**
+ * [format css to Array]
+ * @description 格式化 css 文本，支持注释参数或者规则参数
+ * @param  {[String]} source [css source text]
+ * @return {[Array]}        [array]
+ * @css example
+	\/*
+	 * {{delay:2000}}
+	 * 彩蛋时间到！
+	 *\/
+	html,body{
+		// speed: 200
+	    background: #2d2d2d;
+	}
+
+ * @return example [/ -> \/]
+	[{
+		type: 'comment',
+		comment: '\/* \n * \n * 彩蛋时间到！\n *\/',
+		options: { delay: '2000' }
+	}, {
+		type: 'common',
+		selector: 'html,body',
+		options: { speed: 200 },
+		style: { background: '#2d2d2d' }
+	}]
+ */
 function format$1(source) {
 	var sweetResult = [];
 	source = source || '';
@@ -662,4 +693,3 @@ var Magicss = function () {
 return Magicss;
 
 })));
-//# sourceMappingURL=magicss.js.map
