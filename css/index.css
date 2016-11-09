@@ -1,7 +1,7 @@
 .toggle {
 	position: fixed;
 	right: 2px;
-	bottom: 2px;
+	top: 2px;
 	outline: none;
 	border: none;
 	color: rgba(253,91,90,1);
@@ -16,7 +16,7 @@
 
 .code-input-con {
 	position: fixed;
-	display: none;
+	opacity: 0;
 	width: 500px;
 	height: 300px;
 	right: 5px;
@@ -52,39 +52,3 @@
     box-sizing: border-box;
     line-height: 16px;
 }
-
-
-
-
-
-
-// * {
-// 	transition: all ease 0.8s;
-// }
-// #work-con {
-// 	/* speed: 20 */
-//     position: fixed;
-//     width: 40%;
-//     height: 94%;
-//     top: 3%;
-//     left: 1%;
-//     border: 1px solid #333;
-//     background-color: #282c34;
-//     color: #fff;
-// }
-// #work-con .comment {
-// 	/* speed: 20 */
-//     color: #747269;
-// }
-// #work-con .selector {
-// 	/* speed: 20 */
-//     color: #e96951;
-// }
-// #work-con .key {
-// 	/* speed: 20 */
-//     color: #fb9356;
-// }
-// #work-con .value {
-// 	/* speed: 20 */
-//     color: #62cbcc;
-// }

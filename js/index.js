@@ -6,7 +6,19 @@ var editor = CodeMirror($('#code'), {
 	lineNumbers: true,
 	mode: 'css',
 	inputStyle: 'contenteditable',
-	theme: 'monokai'
+	theme: 'monokai',
+	value: 
+`/*
+ * Type your css and biu it.
+ *
+ * Click or Command + Enter to biu.
+ *
+ * Press Space to toggle process.
+ *
+ * Also, you can set options for your css.
+ * 
+ * For details, please see https://github.com/luoye-fe/magicss.
+ */`
 });
 
 var magicss = new Magicss();
@@ -32,6 +44,9 @@ window.addEventListener('keydown', function(e) {
 	if (e.metaKey && e.keyCode === 13 && editor.hasFocus()) {
 		biu();
 	}
+	if (e.keyCode === 32 && !editor.hasFocus()) {
+		toggle();
+	}
 });
 
 const content = [`
@@ -44,7 +59,7 @@ const content = [`
 /* {{delay: 1000}}
  * Magicss, apply your css rules real-time while printing them on the screen.
  *
- * Now, show it.
+ * Now, show it!
  */
 
 `,`
@@ -103,8 +118,11 @@ const content = [`
 }`, `
 #work-con {
 	/* speed: 20 */
-	perspective-origin: 50% 50%;
-	transform: perspective(3600px) rotateY(740deg);
+	transform: perspective(4000px) rotateY(740deg);
+}
+`,`
+.code-input-con {
+	opacity: 1;
 }
 `];
 
