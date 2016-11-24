@@ -6,8 +6,9 @@ var sourceText = `
 }
 html, body {
     background: #2d2d2d;
+    color: #fff;
 }
-/* global Magicss */
+/* {{delay: 2000}}global Magicss */
 /* global Magicss */
 /* global Magicss */
 /* global Magicss */
@@ -15,13 +16,28 @@ html, body {
 /* global Magicss */
 `;
 
-var baymax = new Magicss({
-	source: sourceText,
-	codeCon: document.getElementById('work_con'),
-	onChange: function(process, argvs) {
-		console.log(process);
-		console.log(argvs);
-	}
+var baymax = new Magicss();
+
+baymax.stop().then(() => {
+	baymax.setOptions({
+		source: sourceText,
+		codeCon: document.getElementById('work_con'),
+		onChange: function(process, argvs) {
+			console.log(process);
+			console.log(argvs);
+		}
+	});
 });
 
-baymax.init();
+baymax.stop().then(() => {
+	baymax.setOptions({
+		source: sourceText,
+		codeCon: document.getElementById('work_con'),
+		onChange: function(process, argvs) {
+			console.log(process);
+			console.log(argvs);
+		}
+	});
+});
+
+// baymax.init();
