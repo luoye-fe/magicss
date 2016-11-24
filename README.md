@@ -3,7 +3,7 @@ Magicss
 
 ### Magicss - apply your css rules real-time while printing them on the screen.
 
-[Live demo in here](http://luoye.pw/magicss/)
+[Live demo in here](http://luoye-fe.github.io/magicss/)
 
 ![gif](./docs/static/magicss.gif)
 
